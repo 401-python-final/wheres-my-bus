@@ -1,4 +1,5 @@
 # Where's My Bus?
+Django/React-Native application that allows users to query estimated arrival time for busses in their area.
 
 ## Contributors:
   * Stephen Koch kochsjs@gmail.com
