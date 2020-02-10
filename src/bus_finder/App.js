@@ -9,10 +9,10 @@ import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elemen
 
 
 export default class App extends React.Component {
-  cosntructor(props){
+  constructor(props){
     super(props)
   }
-  
+
   state = {
     location: null,
     errorMessage: null,
@@ -45,6 +45,7 @@ export default class App extends React.Component {
 
     return (
       <View style={styles.container}>
+        <Text>Where is my bus?</Text>
         <BusForm location={this.state.location} />
       </View>
     );
