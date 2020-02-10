@@ -3,55 +3,51 @@ import { TextInput, Button } from 'react-native';
 import { render } from 'react-dom';
 
 
-//  class BusForm extends React.Component{
-//     constructor(props){
-//         super(props);
-//         this.state = {
-//             input: ""
-//         };
-//         this.handleInput = this.handleInput.bind(this);
-//     }
-//     hadleInput(){
-//         this.setState({input: "str"})
-//     }
 
-// render() {
-//     return (
-//         <>
-//         <TextInput
-//         style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-//         onChangeText={this.hadleInput()}
-//         value= {this.state.input}
-//         />
-//         <Button
-//         onPress={() => console.log(value)}
-//         title="Submit"
-//         />
-//         </>
-//     );
-//     }
-// }
 export default function BusForm(props) {
     const state = {
-        input: ""
+        busNumber: ""
     };
 
+    const [value, onChangeText] = React.useState(state.busNumber);
 
-  const [value, onChangeText] = React.useState(state.input);
-  return (
-    <>
-    <TextInput
-      style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
-      onChangeText={text => onChangeText(text)}
-      value={value}
-    />
-    <Button
-    onPress={() => console.log(props.location)}
-    title="Submit"
-    />
-    </>
-  );
+    function submitHandler(event){
+        let url =`https://swapi.co/api/people/${value}`
+        console.log(url)
+        return fetch(url)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                console.log(responseJson.name)
+                console.log(`bus number: ${value}`)
+                console.log(props.location)
+                return responseJson.name;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+
+
+
+
+    return (
+        <>
+            <TextInput
+                style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
+                onChangeText={text => onChangeText(text)}
+                value={value}
+            />
+            <Button
+                onPress={() => submitHandler()}
+                title="Submit"
+            />
+        </>
+    );
 }
+// when button Submit clicked > call event handler, that will make an API call to back end
+    // if call was successsful render Details component
+    // else render error message on the page
 
 
 
