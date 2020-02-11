@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { TextInput, Button } from "react-native";
 import { render } from "react-dom";
+import Details from "./Details";
 
 export default function BusForm(props) {
     const state = {
@@ -39,6 +40,8 @@ export default function BusForm(props) {
                 value={value}
             />
             <Button onPress={() => submitHandler()} title="Submit" />
+            
+            <Details lat={props.lat} long={props.long} />
         </>
     );
 }
