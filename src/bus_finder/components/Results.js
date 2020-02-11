@@ -20,9 +20,9 @@ export default class Results extends React.Component {
     render() {
         const htmlContent = `
         <h2>Route Number: ${this.props.busNumber}</h2>
-        <h3>Waiting Time for ${this.props.closest.closest_direction} Direction: ${this.props.closest.closest_minutes}</h3>
-        <h3>Waiting Time for ${this.props.nextClosest.next_closest_direction} Direction: ${this.props.nextClosest.next_closest_minutes}</h3>
-        `;
+        <h3>Waiting Time for ${this.props.closest.closestDirection} Direction: ${this.props.closest.closestMinutes}</h3>
+        <h3>Waiting Time for ${this.props.nextClosest.nextClosestDirection} Direction: ${this.props.nextClosest.nextClosestMinutes}</h3>
+        `
 
         return (
             <>
