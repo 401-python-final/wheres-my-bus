@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TextInput, Button, ShadowPropTypesIOS } from "react-native";
+import { TextInput, Text, Button, ShadowPropTypesIOS, StyleSheet, View, TouchableOpacity } from "react-native";
 import { render } from "react-dom";
 import BusMap from './BusMap.js'
 
@@ -28,22 +28,52 @@ export default function BusForm(props) {
     }
 
     return (
-        <>
+        <View style={styles.container}>
             <TextInput
-                style={{
-                    height: 40,
-                    width: 200,
-                    borderColor: "gray",
-                    borderWidth: 1
-                }}
+                style={styles.input}
                 onChangeText={text => onChangeText(text)}
                 value={value}
             />
-            <Button onPress={() => submitHandler()} title="Submit" />
+            <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => submitHandler()}>
+                <Text style={styles.submitButtonText}> Where's My Bus </Text>
+            </TouchableOpacity>
             <BusMap lat={props.lat} long={props.long} />
-        </>
+
+        </View>
     );
 }
+
+const styles = StyleSheet.create({
+
+    container: {
+        paddingTop: 23,
+
+    },
+    input: {
+        margin: 15,
+        height: 40,
+        borderColor: '#7a42f4',
+        borderWidth: 1,
+        textAlign: 'center',
+
+    },
+    submitButton: {
+        backgroundColor: '#7a42f4',
+        padding: 10,
+        margin: 15,
+        height: 40,
+        width: 150,
+
+
+    },
+    submitButtonText: {
+        color: 'white'
+    }
+
+
+});
 // when button Submit clicked > call event handler, that will make an API call to back end
 // if call was successsful render Details component
 // else render error message on the page

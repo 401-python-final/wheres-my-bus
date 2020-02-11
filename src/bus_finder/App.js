@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import BusForm from "./components/BusForm";
+import BusMap from './components/BusMap'
 import {
     FormLabel,
     FormInput,
@@ -52,8 +53,8 @@ export default class App extends React.Component {
 
         return (
             <View style={styles.container}>
-                <Text>Where is my bus?</Text>
                 <BusForm lat={this.state.lat} long={this.state.long} busCoords={this.state.busCoords} />
+
             </View>
         );
     }
