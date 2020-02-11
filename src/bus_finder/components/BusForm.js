@@ -11,7 +11,8 @@ import {
     Dimensions
 } from "react-native";
 import { render } from "react-dom";
-import BusMap from "./BusMap.js";
+import BusMap from './BusMap.js'
+import Results from './Results.js'
 const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
@@ -30,8 +31,27 @@ export default function BusForm(props) {
             next_closest_direction: null,
             next_closest_minutes: null,
             next_closest_lat: null,
-            next_closest_lon: null
+            next_closest_lon: null,
+        },
+
+        testData1: {
+            closest_name: 1,
+            closest_direction: "N",
+            closest_minutes: "12 minutes",
+            closest_lat: 1,
+            closest_lon: 1
+        },
+
+        testData2: {
+            next_closest_name: 2,
+            next_closest_direction: "SE",
+            next_closest_minutes: "5 minutes",
+            next_closest_lat: 2,
+            next_closest_lon: 2
         }
+
+
+
     };
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busData, updateBusData] = React.useState(busState);
@@ -59,8 +79,10 @@ export default function BusForm(props) {
     let homeButton;
     let button;
     let busmap;
+    let results;
 
     if (mapDisplay) {
+        results = <Results busNumber ={busData.busNumber} closest={busState.testData1} nextClosest={busState.testData2}/>
         busmap = (
             <BusMap
                 lat={props.lat}
@@ -102,6 +124,7 @@ export default function BusForm(props) {
         <View style={styles.container}>
             {homeButton}
             {button}
+            {results}
             {busmap}
         </View>
     );
