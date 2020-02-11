@@ -70,6 +70,7 @@ export default function BusForm(props) {
         //     });
 
         setMapDisplay(true);
+        updateBusData({busNumber: ""});
     }
 
     function returnHome() {
