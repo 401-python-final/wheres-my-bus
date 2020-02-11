@@ -8,11 +8,14 @@ import {
     View,
     TouchableOpacity,
     Image,
-    Dimensions
+    Dimensions,
+    Animated
 } from "react-native";
 import { render } from "react-dom";
-import BusMap from './BusMap.js'
-import Results from './Results.js'
+import BusMap from "./BusMap.js";
+import Results from "./Results.js";
+import TextCarousel from "react-native-text-carousel";
+
 const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
@@ -31,7 +34,7 @@ export default function BusForm(props) {
             next_closest_direction: null,
             next_closest_minutes: null,
             next_closest_lat: null,
-            next_closest_lon: null,
+            next_closest_lon: null
         },
 
         testData1: {
@@ -49,9 +52,6 @@ export default function BusForm(props) {
             next_closest_lat: 2,
             next_closest_lon: 2
         }
-
-
-
     };
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busData, updateBusData] = React.useState(busState);
@@ -70,7 +70,7 @@ export default function BusForm(props) {
         //     });
 
         setMapDisplay(true);
-        updateBusData({busNumber: ""});
+        updateBusData({ busNumber: "" });
     }
 
     function returnHome() {
@@ -83,7 +83,13 @@ export default function BusForm(props) {
     let results;
 
     if (mapDisplay) {
-        results = <Results busNumber ={busData.busNumber} closest={busState.testData1} nextClosest={busState.testData2}/>
+        results = (
+            <Results
+                busNumber={busData.busNumber}
+                closest={busState.testData1}
+                nextClosest={busState.testData2}
+            />
+        );
         busmap = (
             <BusMap
                 lat={props.lat}
@@ -103,6 +109,22 @@ export default function BusForm(props) {
         button = (
             <View style={styles.container}>
                 <Text style={styles.header}>Where's My Bus?</Text>
+
+                <TextCarousel>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>Tap to speak</Text>
+                        </View>
+                    </TextCarousel.Item>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>
+                                When does "8" get here?
+                            </Text>
+                        </View>
+                    </TextCarousel.Item>
+                </TextCarousel>
+
                 <TouchableOpacity
                     style={styles.submitButton}
                     onPress={() => submitHandler()}
@@ -112,6 +134,7 @@ export default function BusForm(props) {
                         source={require("./button.png")}
                     />
                 </TouchableOpacity>
+
                 <TextInput
                     style={styles.input}
                     onChangeText={text => updateBusData({ busNumber: text })}
@@ -132,12 +155,28 @@ export default function BusForm(props) {
 }
 
 const styles = StyleSheet.create({
+    opacityText: {
+        opacity: 0.2,
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 20
+    },
+
+    carouselContainer: {
+        margin: 0,
+        justifyContent: "center", //Centered vertically
+        alignItems: "center",
+        paddingBottom: 0
+    },
     header: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 20,
         color: "white",
         justifyContent: "center", //Centered vertically
         alignItems: "center", // Centered horizontally,
         fontWeight: "bold",
-        fontSize: 50,
+        fontSize: 47,
         paddingBottom: 70
     },
     container: {
@@ -151,7 +190,7 @@ const styles = StyleSheet.create({
         width: width / 2,
         margin: 80,
         height: 40,
-        borderColor: "#7A42F4",
+        borderColor: "#29c7ac",
         borderWidth: 1,
         textAlign: "center"
     },
