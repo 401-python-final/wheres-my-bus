@@ -20,10 +20,18 @@ export default function BusMap(props) {
 
                 <Marker
                     coordinate={{
-                        latitude: props.lat,
-                        longitude: props.long
+                        latitude: props.closest.closest_lat,
+                        longitude: props.closest.closest_lon
                     }}
-                    title={"test"}
+                    title={props.closest.closest_name}
+                    description={"marker"}
+                />
+                <Marker
+                    coordinate={{
+                        latitude: props.nextClosest.next_closest_lat,
+                        longitude: props.nextClosest.next_closest_lon
+                    }}
+                    title={props.nextClosest.next_closest_name}
                     description={"marker"}
                 />
             </MapView>
@@ -62,15 +70,15 @@ const styles = StyleSheet.create({
         marginLeft: "30%",
         marginRight: "30%",
         marginTop: 350
-      },
-      calloutSearch: {
+    },
+    calloutSearch: {
         borderColor: "transparent",
         marginLeft: 10,
         width: "90%",
         marginRight: 10,
         height: 40,
-        borderWidth: 0.0  
-      }
+        borderWidth: 0.0
+    }
 
 
 
