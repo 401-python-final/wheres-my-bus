@@ -17,61 +17,66 @@ const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
     const busState = {
-        busNumber: "",
 
         closestData: {
-            closest_name: null,
-            closest_direction: null,
-            closest_minutes: null,
-            closest_lat: null,
-            closest_lon: null
+            closestName: null,
+            closestDirection: null,
+            closestMinutes: null,
+            closestLat: null,
+            closestLon: null
         },
         nextClosestData: {
-            next_closest_name: null,
-            next_closest_direction: null,
-            next_closest_minutes: null,
-            next_closest_lat: null,
-            next_closest_lon: null,
+            nextClosestName: null,
+            nextClosestDirection: null,
+            nextClosestMinutes: null,
+            nextClosestLat: null,
+            nextClosestLon: null,
         },
-
-        testData1: {
-            closest_name: 1,
-            closest_direction: "N",
-            closest_minutes: "12 minutes",
-            closest_lat: 1,
-            closest_lon: 1
-        },
-
-        testData2: {
-            next_closest_name: 2,
-            next_closest_direction: "SE",
-            next_closest_minutes: "5 minutes",
-            next_closest_lat: 2,
-            next_closest_lon: 2
-        }
 
 
 
     };
     const [mapDisplay, setMapDisplay] = React.useState(false);
+    const [busRoute, updateBusRoute] = React.useState("")
     const [busData, updateBusData] = React.useState(busState);
 
-    function submitHandler(event) {
-        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busData.busNumber}`;
+
+    async function submitHandler() {
+        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
         console.log(url);
-        // return fetch(url)
-        //     .then(response => {
-        //         console.log(response)
-        //         // do some logic to update state
 
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //     });
+        const response = await fetch(url);
+        const data = await response.json()
 
+
+        // updateBusRoute("")
+        updateBusData({
+            closestData: {
+                closestName: data.closest_stop.closest_name,
+                closestDirection: data.closest_stop.closest_direction,
+                closestMinutes: data.closest_stop.closest_minutes,
+                closestLat: data.closest_stop.closest_lat,
+                closestLon: data.closest_stop.closest_lon,
+            },
+
+            nextClosestData: {
+                nextClosestName: data.next_closest_stop.next_closest_name,
+                nextClosestDirection: data.next_closest_stop.next_closest_direction,
+                nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
+                nextClosestLat: data.next_closest_stop.next_closest_lat,
+                nextClosestLon: data.next_closest_stop.next_closest_lon,
+
+            }
+
+
+
+        })
         setMapDisplay(true);
-        updateBusData({busNumber: ""});
+
+
     }
+    console.log(busData)
+
 
     function returnHome() {
         setMapDisplay(false);
@@ -83,7 +88,7 @@ export default function BusForm(props) {
     let results;
 
     if (mapDisplay) {
-        results = <Results busNumber ={busData.busNumber} closest={busState.testData1} nextClosest={busState.testData2}/>
+        results = <Results busNumber={busRoute} closest={busData.closestData} nextClosest={busData.nextClosestData} />
         busmap = (
             <BusMap
                 lat={props.lat}
@@ -114,8 +119,8 @@ export default function BusForm(props) {
                 </TouchableOpacity>
                 <TextInput
                     style={styles.input}
-                    onChangeText={text => updateBusData({ busNumber: text })}
-                    value={busData.busNumber}
+                    onChangeText={text => updateBusRoute(text)}
+                    value={busRoute}
                 />
             </View>
         );
