@@ -29,28 +29,38 @@ export default function BusForm(props) {
     const [mapDisplay, setMapDisplay] = React.useState(false)
     const [busData, updateBusData] = React.useState(busState);
 
+
     function submitHandler(event) {
         let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busData.busNumber}`;
         console.log(url);
-        return fetch(url)
-            .then(response => {
-                console.log(response)
-                // do some logic to update state
+        // return fetch(url)
+        //     .then(response => {
+        //         console.log(response)
+        //         // do some logic to update state
 
-            })
-            .catch(error => {
-                console.error(error);
-            });
+        //     })
+        //     .catch(error => {
+        //         console.error(error);
+        //     });
+
+        setMapDisplay(true)
     }
 
-    if (mapDisplay === true) {
-        busmap = <BusMap lat={props.lat} long={props.long} closest={busData.closestData} nextClosest={busData.nextClosestData}/>
+    function returnHome(){
+        setMapDisplay(false)
+    }
+    
+    let homeButton;
+    let button;
+    let busmap;
+
+    if (mapDisplay) {
+        busmap = <BusMap lat={props.lat} long={props.long} closest={busData.closestData} nextClosest={busData.nextClosestData} />
+        button = <></>
+        homeButton= <Button title='back' onPress={() => returnHome()} > </Button>
     } else {
         busmap = <></>
-    }
-
-    return (
-        <View style={styles.container}>
+        button = <View style={styles.container}>
             <TextInput
                 style={styles.input}
                 onChangeText={text => updateBusData({ busNumber: text })}
@@ -62,7 +72,17 @@ export default function BusForm(props) {
                 <Text style={styles.submitButtonText}> Where's My Bus </Text>
             </TouchableOpacity>
 
+        </View>
+    }
+
+
+
+    return (
+        <View>
+            {homeButton}
+            {button}
             {busmap}
+
         </View>
     );
 }

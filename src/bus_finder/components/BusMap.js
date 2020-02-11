@@ -18,7 +18,7 @@ export default function BusMap(props) {
                 }}
             >
 
-                <Marker
+                {/* <Marker
                     coordinate={{
                         latitude: props.closest.closest_lat,
                         longitude: props.closest.closest_lon
@@ -33,7 +33,7 @@ export default function BusMap(props) {
                     }}
                     title={props.nextClosest.next_closest_name}
                     description={"marker"}
-                />
+                /> */}
             </MapView>
 
             {/* <Callout>
