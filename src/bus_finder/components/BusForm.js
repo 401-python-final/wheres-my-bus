@@ -8,11 +8,14 @@ import {
     View,
     TouchableOpacity,
     Image,
-    Dimensions
+    Dimensions,
+    Animated
 } from "react-native";
 import { render } from "react-dom";
-import BusMap from './BusMap.js'
-import Results from './Results.js'
+import BusMap from "./BusMap.js";
+import Results from "./Results.js";
+import TextCarousel from "react-native-text-carousel";
+
 const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
@@ -108,6 +111,22 @@ export default function BusForm(props) {
         button = (
             <View style={styles.container}>
                 <Text style={styles.header}>Where's My Bus?</Text>
+
+                <TextCarousel>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>Tap to speak</Text>
+                        </View>
+                    </TextCarousel.Item>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>
+                                When does "8" get here?
+                            </Text>
+                        </View>
+                    </TextCarousel.Item>
+                </TextCarousel>
+
                 <TouchableOpacity
                     style={styles.submitButton}
                     onPress={() => submitHandler()}
@@ -117,6 +136,7 @@ export default function BusForm(props) {
                         source={require("./button.png")}
                     />
                 </TouchableOpacity>
+
                 <TextInput
                     style={styles.input}
                     onChangeText={text => updateBusRoute(text)}
@@ -137,12 +157,28 @@ export default function BusForm(props) {
 }
 
 const styles = StyleSheet.create({
+    opacityText: {
+        opacity: 0.2,
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 20
+    },
+
+    carouselContainer: {
+        margin: 0,
+        justifyContent: "center", //Centered vertically
+        alignItems: "center",
+        paddingBottom: 0
+    },
     header: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 20,
         color: "white",
         justifyContent: "center", //Centered vertically
         alignItems: "center", // Centered horizontally,
         fontWeight: "bold",
-        fontSize: 50,
+        fontSize: 47,
         paddingBottom: 70
     },
     container: {
@@ -156,7 +192,7 @@ const styles = StyleSheet.create({
         width: width / 2,
         margin: 80,
         height: 40,
-        borderColor: "#7A42F4",
+        borderColor: "#29c7ac",
         borderWidth: 1,
         textAlign: "center"
     },

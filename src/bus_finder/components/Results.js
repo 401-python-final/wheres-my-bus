@@ -1,9 +1,7 @@
 import React from "react";
 
-import { ScrollView, Dimensions } from 'react-native';
-import HTML from 'react-native-render-html';
-
-
+import { ScrollView, Dimensions } from "react-native";
+import HTML from "react-native-render-html";
 
 // export default class Results extends React.Component {
 //     render() {
@@ -17,7 +15,7 @@ import HTML from 'react-native-render-html';
 export default class Results extends React.Component {
     constructor(props) {
         super(props);
-    };
+    }
 
     render() {
         const htmlContent = `
@@ -29,12 +27,14 @@ export default class Results extends React.Component {
         return (
             <>
                 <ScrollView style={{ flex: 1 }}>
-                    <HTML html={htmlContent} imagesMaxWidth={Dimensions.get('window').width} />
+                    <HTML
+                        html={htmlContent}
+                        imagesMaxWidth={Dimensions.get("window").width}
+                    />
                 </ScrollView>
 
                 {/* <BusMap lat={props.lat} long={props.long} closest={this.props.closest} nextClosest={this.props.nextClosest}/> */}
             </>
-
-        )
+        );
     }
 }
