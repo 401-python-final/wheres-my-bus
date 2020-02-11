@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { TextInput, Text, Button, ShadowPropTypesIOS, StyleSheet, View, TouchableOpacity } from "react-native";
 import { render } from "react-dom";
 import BusMap from './BusMap.js'
+import Results from './Results.js'
 
 export default function BusForm(props) {
 
@@ -22,6 +23,22 @@ export default function BusForm(props) {
             next_closest_lat: null,
             next_closest_lon: null,
         },
+
+        testData1: {
+            closest_name: 1,
+            closest_direction: "N",
+            closest_minutes: "12 minutes",
+            closest_lat: 1,
+            closest_lon: 1
+        },
+
+        testData2: {
+            next_closest_name: 2,
+            next_closest_direction: "SE",
+            next_closest_minutes: "5 minutes",
+            next_closest_lat: 2,
+            next_closest_lon: 2
+        }
 
 
 
@@ -49,12 +66,14 @@ export default function BusForm(props) {
     function returnHome(){
         setMapDisplay(false)
     }
-    
+
     let homeButton;
     let button;
     let busmap;
+    let results;
 
     if (mapDisplay) {
+        results = <Results busNumber ={busData.busNumber} closest={busState.testData1} nextClosest={busState.testData2}/>
         busmap = <BusMap lat={props.lat} long={props.long} closest={busData.closestData} nextClosest={busData.nextClosestData} />
         button = <></>
         homeButton= <Button title='back' onPress={() => returnHome()} > </Button>
@@ -81,6 +100,7 @@ export default function BusForm(props) {
         <View>
             {homeButton}
             {button}
+            {results}
             {busmap}
 
         </View>
