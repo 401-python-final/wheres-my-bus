@@ -4,43 +4,65 @@ import { render } from "react-dom";
 import BusMap from './BusMap.js'
 
 export default function BusForm(props) {
-    const state = {
-        busNumber: ""
-    };
 
-    const [value, onChangeText] = React.useState(state.busNumber);
+    const busState = {
+        busNumber: "",
+
+        closestData: {
+            closest_name: null,
+            closest_direction: null,
+            closest_minutes: null,
+            closest_lat: null,
+            closest_lon: null,
+        },
+        nextClosestData: {
+            next_closest_name: null,
+            next_closest_direction: null,
+            next_closest_minutes: null,
+            next_closest_lat: null,
+            next_closest_lon: null,
+        },
+
+
+
+    };
+    const [mapDisplay, setMapDisplay] = React.useState(false)
+    const [busData, updateBusData] = React.useState(busState);
 
     function submitHandler(event) {
-        let url = `https://swapi.co/api/people/${value}`;
+        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busData.busNumber}`;
         console.log(url);
         return fetch(url)
-            .then(response => response.json())
-            .then(responseJson => {
-                console.log(responseJson.name);
-                console.log(`bus number: ${value}`);
-                console.log(props.lat);
-                console.log(props.long);
-                return responseJson.name;
+            .then(response => {
+                console.log(response)
+                // do some logic to update state
+
             })
             .catch(error => {
                 console.error(error);
             });
     }
 
+    if (mapDisplay === true) {
+        busmap = <BusMap lat={props.lat} long={props.long} closest={busData.closestData} nextClosest={busData.nextClosestData}/>
+    } else {
+        busmap = <></>
+    }
+
     return (
         <View style={styles.container}>
             <TextInput
                 style={styles.input}
-                onChangeText={text => onChangeText(text)}
-                value={value}
+                onChangeText={text => updateBusData({ busNumber: text })}
+                value={busData.busNumber}
             />
             <TouchableOpacity
                 style={styles.submitButton}
                 onPress={() => submitHandler()}>
                 <Text style={styles.submitButtonText}> Where's My Bus </Text>
             </TouchableOpacity>
-            <BusMap lat={props.lat} long={props.long} />
 
+            {busmap}
         </View>
     );
 }
