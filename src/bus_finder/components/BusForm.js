@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { TextInput, Button } from "react-native";
+import { TextInput, Button, ShadowPropTypesIOS } from "react-native";
 import { render } from "react-dom";
+import BusMap from './BusMap.js'
 
 export default function BusForm(props) {
     const state = {
@@ -39,6 +40,7 @@ export default function BusForm(props) {
                 value={value}
             />
             <Button onPress={() => submitHandler()} title="Submit" />
+            <BusMap lat={props.lat} long={props.long} />
         </>
     );
 }
