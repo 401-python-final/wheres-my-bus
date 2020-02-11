@@ -1,5 +1,7 @@
 # Where's My Bus?
 Django/React-Native application that allows users to query estimated arrival time for busses in their area.
+This app is designed for someone that already knows details about his commute by knowing his bus number but doesn't necessarily wants to always keep track of the time.
+
 
 ## Contributors:
   * Stephen Koch kochsjs@gmail.com
@@ -9,9 +11,28 @@ Django/React-Native application that allows users to query estimated arrival tim
   * Alvian Joseph alvianjoseph@gmail.com
 
 ## MVP
+A mobile-based application that allows an experienced commuter (user) to quickly check on the status of their bus by typing the bus number in the form. The app should then quickly return in how many minutes the bus will be at the bus stop and display near by bus stops for the bus on te map .
 
+MVP will be presenting the app on a mobile device
 
 ## Stretch Goals
+* check on the status of their bus by asking "When does X bus come to X location?" the app should then quickly respond by telling the commuter (user) in how many minutes the bus will be at the bus stop.
+* Find bus time not only by current user location but with other locations
+* Save your routes in database with login
+* Keep all neray routse in state
+* Suggestions for routes
+* Function to set alarm when the particular bus nearby
+
+## User Stories
+1. As a user, I want to an updated time of when my bus is going to arrive.
+
+2. As a user I want to get a descriptive error message in case if data about my bus is not available.
+
+3. As a user I want to voice activate the app and ask for what time my specific bus will pass
+
+4. As a Developer, I want to be able to send a get request to the API and get data back
+
+5. As a User, I want to be asked if the app has my permission to use my location/microphone
 
 ## Team Agreement
 <details><summary>Communication plan</summary>
@@ -54,7 +75,7 @@ Django/React-Native application that allows users to query estimated arrival tim
 * Charlie will update Trello every day with the tasks from whiteboard
 * Project management tools:
   - Whiteboard
-  - Trello 
+  - Trello
 
 </p>
 </details>
@@ -62,7 +83,7 @@ Django/React-Native application that allows users to query estimated arrival tim
 <details><summary>Git Process</summary>
 <p>
 
-### Our branches: 
+### Our branches:
 * Master
 * Dev branch
 * Feature branches
@@ -91,10 +112,12 @@ Django/React-Native application that allows users to query estimated arrival tim
 
 
 
-![Domain model:](/assets/domainmodel.jpg)
-![Wireframe:](/assets/wireframe.png)
+![Domain model:](./assets/domainmodel.jpg)
+
+#### Wireframe
+![Wireframe:](./assets/wireframe.jpg)
 
 
 
-  
+
 
