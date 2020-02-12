@@ -12,8 +12,8 @@ export default function BusMap(props) {
                 initialRegion={{
                     latitude: props.lat,
                     longitude: props.long,
-                    latitudeDelta: 0.922,
-                    longitudeDelta: 0.0421,
+                    latitudeDelta: 0.022,
+                    longitudeDelta: 0.00421,
                 }}
             >
 
@@ -22,16 +22,16 @@ export default function BusMap(props) {
                         latitude: props.closest.closestLat,
                         longitude: props.closest.closestLon
                     }}
-                    title={props.closest.closest_name}
-                    description={"marker"}
+                    title={props.closest.closestName}
+                    description={`Direction: ${props.closest.closestDirection}`}
                 />
                 <Marker
                     coordinate={{
                         latitude: props.nextClosest.nextClosestLat,
                         longitude: props.nextClosest.nextClosestLon
                     }}
-                    title={props.nextClosest.next_closest_name}
-                    description={"marker"}
+                    title={props.nextClosest.nextClosestName}
+                    description={`Direction: ${props.nextClosest.nextClosestDirection}`}
                 />
             </MapView>
 
