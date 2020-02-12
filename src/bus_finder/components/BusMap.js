@@ -4,36 +4,36 @@ import { StyleSheet, Text, View, Dimensions, TextInput } from "react-native";
 
 export default function BusMap(props) {
     return (
-        <View style={styles.bottom}>
-            <View style={styles.container}>
-                <MapView
-                    style={styles.mapStyle}
-                    customMapStyle={customizedMap}
-                    initialRegion={{
-                        latitude: props.lat,
-                        longitude: props.long,
-                        latitudeDelta: 0.922,
-                        longitudeDelta: 0.0421
+        <View style={styles.container}>
+            <MapView
+                style={styles.mapStyle}
+                customMapStyle={customizedMap}
+                initialRegion={{
+                    latitude: props.lat,
+                    longitude: props.long,
+                    latitudeDelta: 0.022,
+                    longitudeDelta: 0.00421,
+                }}
+            >
+
+                <Marker
+                    coordinate={{
+                        latitude: props.closest.closestLat,
+                        longitude: props.closest.closestLon
                     }}
-                >
-                    <Marker
-                        coordinate={{
-                            latitude: props.closest.closestLat,
-                            longitude: props.closest.closestLon
-                        }}
-                        title={props.closest.closest_name}
-                        description={"marker"}
-                    />
-                    <Marker
-                        coordinate={{
-                            latitude: props.nextClosest.nextClosestLat,
-                            longitude: props.nextClosest.nextClosestLon
-                        }}
-                        title={props.nextClosest.next_closest_name}
-                        description={"marker"}
-                    />
-                </MapView>
-            </View>
+                    title={props.closest.closestName}
+                    description={`Direction: ${props.closest.closestDirection}`}
+                />
+                <Marker
+                    coordinate={{
+                        latitude: props.nextClosest.nextClosestLat,
+                        longitude: props.nextClosest.nextClosestLon
+                    }}
+                    title={props.nextClosest.nextClosestName}
+                    description={`Direction: ${props.nextClosest.nextClosestDirection}`}
+                />
+            </MapView>
+
             {/* <Callout>
                 <View style={styles.calloutView} >
                     <TextInput style={styles.calloutSearch}
