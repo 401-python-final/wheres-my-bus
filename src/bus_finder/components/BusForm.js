@@ -17,6 +17,7 @@ import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 
 const { width } = Dimensions.get("screen");
+const { height } = Dimensions.get("screen");
 
 export default function BusForm(props) {
     const busState = {
@@ -160,9 +161,9 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
         margin: 50,
-        justifyContent: "center", //Centered vertically
-        alignItems: "center",
-        paddingBottom: 20
+        marginBottom: 25,
+        justifyContent: "space-between", //Centered vertically
+        alignItems: "center"
     },
     opacityText: {
         opacity: 0.2,
@@ -181,7 +182,7 @@ const styles = StyleSheet.create({
         paddingLeft: 20,
         paddingRight: 20,
         paddingTop: 20,
-        color: "white",
+        color: "#f7f5f5",
         justifyContent: "center", //Centered vertically
         alignItems: "center", // Centered horizontally,
         fontWeight: "bold",
@@ -193,24 +194,24 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#54123B",
         paddingTop: 40,
-        ...StyleSheet.absoluteFillObject
+        ...StyleSheet.absoluteFillObject,
+        width: width,
+        height: height
     },
     input: {
         width: width / 2,
         margin: 0,
         height: 40,
         borderColor: "#29c7ac",
-        borderWidth: 1,
-        textAlign: "center"
+        borderWidth: 3,
+        textAlign: "center",
+        backgroundColor: "#f7f5f5"
     },
     submitButton: {
         alignItems: "center",
         padding: 10,
         width: width / 1.5,
         height: width / 1.5
-    },
-    submitButtonText: {
-        color: "white"
     }
 });
 // when button Submit clicked > call event handler, that will make an API call to back end
