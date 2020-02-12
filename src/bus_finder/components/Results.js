@@ -22,7 +22,7 @@ export default class Results extends React.Component {
         <h2>Route Number: ${this.props.busNumber}</h2>
         <h3>Bus will come to the ${this.props.closest.closestName} [${this.props.closest.closestDirection} direction] bus stop in ${this.props.closest.closestMinutes} minutes</h3>
         <h3>Bus will come to the ${this.props.nextClosest.nextClosestName} [${this.props.nextClosest.nextClosestDirection} direction] bus stop in ${this.props.nextClosest.nextClosestMinutes} minutes</h3>
-        `
+        `;
 
         return (
             <>
@@ -32,7 +32,7 @@ export default class Results extends React.Component {
                             Your Route Number is: {this.props.busNumber}
                         </Text>
                         <Text style={styles.header}>
-                            The Waiting time for
+                            Bus will come to the
                             {this.props.closest.closestDirection} Direction:
                             {this.props.closest.closestMinutes}
                         </Text>

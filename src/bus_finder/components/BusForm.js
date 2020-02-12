@@ -132,9 +132,10 @@ export default function BusForm(props) {
                             </TextCarousel.Item>
                         </TextCarousel>
                         <Ripple
-                            rippleColor="#c02739"
+                            rippleColor="rgb(52, 61, 235)"
                             rippleDuration="2400"
-                            rippleContainerBorderRadius="200"
+                            rippleContainerBorderRadius="100"
+                            rippleCentered="true"
                             style={styles.submitButton}
                             onPress={() => submitHandler()}
                         >
