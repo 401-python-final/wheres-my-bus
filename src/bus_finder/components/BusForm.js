@@ -20,7 +20,6 @@ const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
     const busState = {
-
         closestData: {
             closestName: null,
             closestDirection: null,
@@ -39,7 +38,7 @@ export default function BusForm(props) {
 };
 
     const [mapDisplay, setMapDisplay] = React.useState(false);
-    const [busRoute, updateBusRoute] = React.useState("")
+    const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
 
     async function submitHandler() {
@@ -47,8 +46,7 @@ export default function BusForm(props) {
         console.log(url);
 
         const response = await fetch(url);
-        const data = await response.json()
-
+        const data = await response.json();
 
         // updateBusRoute("")
         updateBusData({
@@ -57,27 +55,21 @@ export default function BusForm(props) {
                 closestDirection: data.closest_stop.closest_direction,
                 closestMinutes: data.closest_stop.closest_minutes,
                 closestLat: data.closest_stop.closest_lat,
-                closestLon: data.closest_stop.closest_lon,
+                closestLon: data.closest_stop.closest_lon
             },
 
             nextClosestData: {
                 nextClosestName: data.next_closest_stop.next_closest_name,
-                nextClosestDirection: data.next_closest_stop.next_closest_direction,
+                nextClosestDirection:
+                    data.next_closest_stop.next_closest_direction,
                 nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
                 nextClosestLat: data.next_closest_stop.next_closest_lat,
-                nextClosestLon: data.next_closest_stop.next_closest_lon,
-
+                nextClosestLon: data.next_closest_stop.next_closest_lon
             }
-
-
-
-        })
+        });
         setMapDisplay(true);
-
-
     }
-    console.log(busData)
-
+    console.log(busData);
 
     function returnHome() {
         setMapDisplay(false);
@@ -89,7 +81,13 @@ export default function BusForm(props) {
     let results;
 
     if (mapDisplay) {
-        results = <Results busNumber={busRoute} closest={busData.closestData} nextClosest={busData.nextClosestData} />
+        results = (
+            <Results
+                busNumber={busRoute}
+                closest={busData.closestData}
+                nextClosest={busData.nextClosestData}
+            />
+        );
         busmap = (
             <BusMap
                 lat={props.lat}
@@ -134,6 +132,9 @@ export default function BusForm(props) {
                         source={require("./button.png")}
                     />
                 </TouchableOpacity>
+                <Text style={styles.opacityText2}>
+                    Or type your bus number and tap
+                </Text>
 
                 <TextInput
                     style={styles.input}
@@ -155,6 +156,16 @@ export default function BusForm(props) {
 }
 
 const styles = StyleSheet.create({
+    opacityText2: {
+        opacity: 0.2,
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 20,
+        margin: 50,
+        justifyContent: "center", //Centered vertically
+        alignItems: "center",
+        paddingBottom: 20
+    },
     opacityText: {
         opacity: 0.2,
         color: "white",
@@ -188,7 +199,7 @@ const styles = StyleSheet.create({
     },
     input: {
         width: width / 2,
-        margin: 80,
+        margin: 0,
         height: 40,
         borderColor: "#29c7ac",
         borderWidth: 1,
