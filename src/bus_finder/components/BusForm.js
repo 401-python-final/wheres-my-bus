@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
 import {
     TextInput,
     Text,
@@ -9,7 +9,8 @@ import {
     TouchableOpacity,
     Image,
     Dimensions,
-    Animated
+    Animated,
+    KeyboardAvoidingView
 } from "react-native";
 import { render } from "react-dom";
 import { Audio } from 'expo-av';
@@ -19,8 +20,11 @@ import TextCarousel from "react-native-text-carousel";
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
 
+import Ripple from "react-native-material-ripple";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const { width } = Dimensions.get("screen");
+const { height } = Dimensions.get("screen");
 
 const recordingOptions = {
     // android not currently in use, but parameters are required
@@ -63,10 +67,9 @@ export default function BusForm(props) {
             nextClosestDirection: null,
             nextClosestMinutes: null,
             nextClosestLat: null,
-            nextClosestLon: null,
-        },
-
-};
+            nextClosestLon: null
+        }
+    };
 
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
@@ -230,61 +233,73 @@ export default function BusForm(props) {
         );
         button = <></>;
         homeButton = (
-            <Button title="back" onPress={() => returnHome()}>
-                {" "}
-            </Button>
+            <Button title="Start Over" onPress={() => returnHome()}></Button>
         );
     } else {
         busmap = <></>;
         button = (
-            <View style={styles.container}>
-                <Text style={styles.header}>Where's My Bus?</Text>
-
-                <TextCarousel>
-                    <TextCarousel.Item>
-                        <View style={styles.carouselContainer}>
-                            <Text style={styles.opacityText}>Tap to speak</Text>
+            <Fragment>
+                <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
+                    <View style={styles.top}>
+                        <View>
+                            <Text style={styles.header}>Where's My Bus?</Text>
                         </View>
-                    </TextCarousel.Item>
-                    <TextCarousel.Item>
-                        <View style={styles.carouselContainer}>
-                            <Text style={styles.opacityText}>
-                                When does "8" get here?
-                            </Text>
-                        </View>
-                    </TextCarousel.Item>
-                </TextCarousel>
+                    </View>
 
-                <TouchableOpacity
-                    style={styles.submitButton}
-                    // onPress={() => submitHandler()}
-                    onPressIn={() => handleOnPressIn()}
-                    onPressOut={() => handleOnPressOut()}
-                >
-                    <Image
-                        style={styles.submitButton}
-                        source={require("./button.png")}
-                    />
-                </TouchableOpacity>
-                <Text style={styles.opacityText2}>
-                    Or type your bus number and tap
-                </Text>
-
-                <TextInput
-                    style={styles.input}
-                    onChangeText={text => updateBusRoute(text)}
-                    value={busRoute}
-                />
-            </View>
+                    <View style={styles.center}>
+                        <TextCarousel>
+                            <TextCarousel.Item>
+                                <View style={styles.carouselContainer}>
+                                    <Text style={styles.opacityText}>
+                                        Tap to speak
+                                    </Text>
+                                </View>
+                            </TextCarousel.Item>
+                            <TextCarousel.Item>
+                                <View style={styles.carouselContainer}>
+                                    <Text style={styles.opacityText}>
+                                        When does "8" get here?
+                                    </Text>
+                                </View>
+                            </TextCarousel.Item>
+                        </TextCarousel>
+                        <Ripple
+                            rippleColor="rgb(52, 61, 235)"
+                            rippleDuration="2400"
+                            // rippleContainerBorderRadius="100" //aj commented this out
+                            rippleCentered="true"
+                            style={styles.submitButton}
+                            // onPress={() => submitHandler()}
+                            onPressIn={() => handleOnPressIn()}
+                            onPressOut={() => handleOnPressOut()}
+                        >
+                            <Image
+                                style={styles.submitButton}
+                                source={require("./button.png")}
+                            />
+                        </Ripple>
+                    </View>
+                    <View style={styles.bottom}>
+                        <Text style={styles.opacityText2}>
+                            Or type your bus number and tap
+                        </Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={text => updateBusRoute(text)}
+                            value={busRoute}
+                        />
+                    </View>
+                </KeyboardAvoidingView>
+            </Fragment>
         );
     }
 
     return (
         <View style={styles.container}>
-            {homeButton}
             {button}
             {results}
             {busmap}
+            {homeButton}
         </View>
     );
 }
@@ -296,9 +311,9 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20,
         margin: 50,
-        justifyContent: "center", //Centered vertically
-        alignItems: "center",
-        paddingBottom: 20
+        marginBottom: 25,
+        justifyContent: "space-between", //Centered vertically
+        alignItems: "center"
     },
     opacityText: {
         opacity: 0.2,
@@ -313,40 +328,49 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingBottom: 0
     },
-    header: {
-        paddingLeft: 20,
-        paddingRight: 20,
-        paddingTop: 20,
-        color: "white",
-        justifyContent: "center", //Centered vertically
-        alignItems: "center", // Centered horizontally,
-        fontWeight: "bold",
-        fontSize: 47,
-        paddingBottom: 70
+    top: {
+        height: "25%",
+        alignItems: "center",
+        justifyContent: "center"
     },
+    header: {
+        color: "#f7f5f5",
+        fontWeight: "bold",
+        fontSize: 47
+    },
+
+    center: {
+        height: "35%",
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
+    bottom: {
+        height: "35%", // aj changed this
+        alignItems: "center",
+        justifyContent: "center"
+    },
+
     container: {
         flex: 1,
-        alignItems: "center",
         backgroundColor: "#54123B",
-        paddingTop: 40,
         ...StyleSheet.absoluteFillObject
     },
+
     input: {
         width: width / 2,
-        margin: 0,
         height: 40,
         borderColor: "#29c7ac",
-        borderWidth: 1,
-        textAlign: "center"
+        borderWidth: 3,
+        backgroundColor: "#f7f5f5",
+        textAlign: 'center', //aj changed this
+
     },
     submitButton: {
         alignItems: "center",
         padding: 10,
         width: width / 1.5,
         height: width / 1.5
-    },
-    submitButtonText: {
-        color: "white"
     }
 });
 // when button Submit clicked > call event handler, that will make an API call to back end
