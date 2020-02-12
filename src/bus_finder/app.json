@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Blank Template",
+    "name": "Where Is My Bus?",
     "slug": "bus_finder",
     "privacy": "public",
     "sdkVersion": "36.0.0",
@@ -23,13 +23,18 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.voicebus.where_is_my_bus"
-    },
+    // "ios": {
+    //   "supportsTablet": true,
+    //   "bundleIdentifier": "com.voicebus_ios.where_is_my_bus"
+    // },
     "android": {
         "package": "com.voicebus.where_is_my_bus",
-        "versionCode": 1
+        "versionCode": 1,
+        "config": {
+            "googleMaps": {
+              "apiKey": "AIzaSyD4bQ0dLcgfMXOq5gFmyvSeoQXPvD3j0gk"
+            }
+          }
       }
   }
 }
