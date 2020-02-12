@@ -134,7 +134,7 @@ export default function BusForm(props) {
                         <Ripple
                             rippleColor="rgb(52, 61, 235)"
                             rippleDuration="2400"
-                            rippleContainerBorderRadius="100"
+                            // rippleContainerBorderRadius="100" //aj commented this out
                             rippleCentered="true"
                             style={styles.submitButton}
                             onPress={() => submitHandler()}
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     },
 
     bottom: {
-        height: "25%",
+        height: "35%", // aj changed this
         alignItems: "center",
         justifyContent: "center"
     },
@@ -228,7 +228,9 @@ const styles = StyleSheet.create({
         height: 40,
         borderColor: "#29c7ac",
         borderWidth: 3,
-        backgroundColor: "#f7f5f5"
+        backgroundColor: "#f7f5f5",
+        textAlign: 'center', //aj changed this
+
     },
     submitButton: {
         alignItems: "center",
