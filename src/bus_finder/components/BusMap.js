@@ -1,40 +1,39 @@
-import React from 'react';
-import MapView, { Marker, Callout } from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
-
+import React from "react";
+import MapView, { Marker, Callout } from "react-native-maps";
+import { StyleSheet, Text, View, Dimensions, TextInput } from "react-native";
 
 export default function BusMap(props) {
     return (
-        <View style={styles.container}>
-            <MapView
-                style={styles.mapStyle}
-                customMapStyle={customizedMap}
-                initialRegion={{
-                    latitude: props.lat,
-                    longitude: props.long,
-                    latitudeDelta: 0.922,
-                    longitudeDelta: 0.0421,
-                }}
-            >
-
-                <Marker
-                    coordinate={{
-                        latitude: props.closest.closestLat,
-                        longitude: props.closest.closestLon
+        <View style={styles.bottom}>
+            <View style={styles.container}>
+                <MapView
+                    style={styles.mapStyle}
+                    customMapStyle={customizedMap}
+                    initialRegion={{
+                        latitude: props.lat,
+                        longitude: props.long,
+                        latitudeDelta: 0.922,
+                        longitudeDelta: 0.0421
                     }}
-                    title={props.closest.closest_name}
-                    description={"marker"}
-                />
-                <Marker
-                    coordinate={{
-                        latitude: props.nextClosest.nextClosestLat,
-                        longitude: props.nextClosest.nextClosestLon
-                    }}
-                    title={props.nextClosest.next_closest_name}
-                    description={"marker"}
-                />
-            </MapView>
-
+                >
+                    <Marker
+                        coordinate={{
+                            latitude: props.closest.closestLat,
+                            longitude: props.closest.closestLon
+                        }}
+                        title={props.closest.closest_name}
+                        description={"marker"}
+                    />
+                    <Marker
+                        coordinate={{
+                            latitude: props.nextClosest.nextClosestLat,
+                            longitude: props.nextClosest.nextClosestLon
+                        }}
+                        title={props.nextClosest.next_closest_name}
+                        description={"marker"}
+                    />
+                </MapView>
+            </View>
             {/* <Callout>
                 <View style={styles.calloutView} >
                     <TextInput style={styles.calloutSearch}
@@ -45,20 +44,19 @@ export default function BusMap(props) {
             {/* aj: this allows us to add components to the map, leaving here for reference */}
         </View>
     );
-
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         // backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: "center",
+        justifyContent: "center"
     },
     mapStyle: {
-        width: Dimensions.get('window').width * .85,
-        height: Dimensions.get('window').height * .60,
-
+        width: Dimensions.get("window").width * 0.85,
+        height: Dimensions.get("window").height * 0.6,
+        borderRadius: 90
     },
 
     calloutView: {
@@ -77,242 +75,244 @@ const styles = StyleSheet.create({
         marginRight: 10,
         height: 40,
         borderWidth: 0.0
+    },
+    bottom: {
+        height: "60%",
+        alignItems: "center",
+        justifyContent: "center"
     }
-
-
-
 });
 
 const customizedMap = [
     {
-        "elementType": "geometry",
-        "stylers": [
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#1d2c4d"
+                color: "#1d2c4d"
             }
         ]
     },
     {
-        "elementType": "labels.text.fill",
-        "stylers": [
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#8ec3b9"
+                color: "#8ec3b9"
             }
         ]
     },
     {
-        "elementType": "labels.text.stroke",
-        "stylers": [
+        elementType: "labels.text.stroke",
+        stylers: [
             {
-                "color": "#1a3646"
+                color: "#1a3646"
             }
         ]
     },
     {
-        "featureType": "administrative.country",
-        "elementType": "geometry.stroke",
-        "stylers": [
+        featureType: "administrative.country",
+        elementType: "geometry.stroke",
+        stylers: [
             {
-                "color": "#4b6878"
+                color: "#4b6878"
             }
         ]
     },
     {
-        "featureType": "administrative.land_parcel",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "administrative.land_parcel",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#64779e"
+                color: "#64779e"
             }
         ]
     },
     {
-        "featureType": "administrative.province",
-        "elementType": "geometry.stroke",
-        "stylers": [
+        featureType: "administrative.province",
+        elementType: "geometry.stroke",
+        stylers: [
             {
-                "color": "#4b6878"
+                color: "#4b6878"
             }
         ]
     },
     {
-        "featureType": "landscape.man_made",
-        "elementType": "geometry.stroke",
-        "stylers": [
+        featureType: "landscape.man_made",
+        elementType: "geometry.stroke",
+        stylers: [
             {
-                "color": "#334e87"
+                color: "#334e87"
             }
         ]
     },
     {
-        "featureType": "landscape.natural",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "landscape.natural",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#023e58"
+                color: "#023e58"
             }
         ]
     },
     {
-        "featureType": "poi",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "poi",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#283d6a"
+                color: "#283d6a"
             }
         ]
     },
     {
-        "featureType": "poi",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "poi",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#6f9ba5"
+                color: "#6f9ba5"
             }
         ]
     },
     {
-        "featureType": "poi",
-        "elementType": "labels.text.stroke",
-        "stylers": [
+        featureType: "poi",
+        elementType: "labels.text.stroke",
+        stylers: [
             {
-                "color": "#1d2c4d"
+                color: "#1d2c4d"
             }
         ]
     },
     {
-        "featureType": "poi.park",
-        "elementType": "geometry.fill",
-        "stylers": [
+        featureType: "poi.park",
+        elementType: "geometry.fill",
+        stylers: [
             {
-                "color": "#023e58"
+                color: "#023e58"
             }
         ]
     },
     {
-        "featureType": "poi.park",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "poi.park",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#3C7680"
+                color: "#3C7680"
             }
         ]
     },
     {
-        "featureType": "road",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "road",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#304a7d"
+                color: "#304a7d"
             }
         ]
     },
     {
-        "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "road",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#98a5be"
+                color: "#98a5be"
             }
         ]
     },
     {
-        "featureType": "road",
-        "elementType": "labels.text.stroke",
-        "stylers": [
+        featureType: "road",
+        elementType: "labels.text.stroke",
+        stylers: [
             {
-                "color": "#1d2c4d"
+                color: "#1d2c4d"
             }
         ]
     },
     {
-        "featureType": "road.highway",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "road.highway",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#2c6675"
+                color: "#2c6675"
             }
         ]
     },
     {
-        "featureType": "road.highway",
-        "elementType": "geometry.stroke",
-        "stylers": [
+        featureType: "road.highway",
+        elementType: "geometry.stroke",
+        stylers: [
             {
-                "color": "#255763"
+                color: "#255763"
             }
         ]
     },
     {
-        "featureType": "road.highway",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "road.highway",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#b0d5ce"
+                color: "#b0d5ce"
             }
         ]
     },
     {
-        "featureType": "road.highway",
-        "elementType": "labels.text.stroke",
-        "stylers": [
+        featureType: "road.highway",
+        elementType: "labels.text.stroke",
+        stylers: [
             {
-                "color": "#023e58"
+                color: "#023e58"
             }
         ]
     },
     {
-        "featureType": "transit",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "transit",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#98a5be"
+                color: "#98a5be"
             }
         ]
     },
     {
-        "featureType": "transit",
-        "elementType": "labels.text.stroke",
-        "stylers": [
+        featureType: "transit",
+        elementType: "labels.text.stroke",
+        stylers: [
             {
-                "color": "#1d2c4d"
+                color: "#1d2c4d"
             }
         ]
     },
     {
-        "featureType": "transit.line",
-        "elementType": "geometry.fill",
-        "stylers": [
+        featureType: "transit.line",
+        elementType: "geometry.fill",
+        stylers: [
             {
-                "color": "#283d6a"
+                color: "#283d6a"
             }
         ]
     },
     {
-        "featureType": "transit.station",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "transit.station",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#3a4762"
+                color: "#3a4762"
             }
         ]
     },
     {
-        "featureType": "water",
-        "elementType": "geometry",
-        "stylers": [
+        featureType: "water",
+        elementType: "geometry",
+        stylers: [
             {
-                "color": "#0e1626"
+                color: "#0e1626"
             }
         ]
     },
     {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
+        featureType: "water",
+        elementType: "labels.text.fill",
+        stylers: [
             {
-                "color": "#4e6d70"
+                color: "#4e6d70"
             }
         ]
     }
-]
+];
