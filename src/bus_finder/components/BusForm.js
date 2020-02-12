@@ -12,14 +12,45 @@ import {
     Animated
 } from "react-native";
 import { render } from "react-dom";
+import { Audio } from 'expo-av';
 import BusMap from "./BusMap.js";
 import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
+import * as Permissions from 'expo-permissions';
+import * as FileSystem from 'expo-file-system';
+
 
 const { width } = Dimensions.get("screen");
 
+const recordingOptions = {
+    // android not currently in use, but parameters are required
+    android: {
+        extension: '.m4a',
+        outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+        audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+        sampleRate: 44100,
+        numberOfChannels: 2,
+        bitRate: 128000,
+    },
+    ios: {
+        extension: '.wav',
+        audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+        sampleRate: 44100,
+        numberOfChannels: 1,
+        bitRate: 128000,
+        linearPCMBitDepth: 16,
+        linearPCMIsBigEndian: false,
+        linearPCMIsFloat: false,
+    },
+};
+
+
 export default function BusForm(props) {
     const busState = {
+        isRecording: false,
+        isFetching: false,
+        _recording: new Audio.Recording(),
+        query: null,
         closestData: {
             closestName: null,
             closestDirection: null,
@@ -40,6 +71,19 @@ export default function BusForm(props) {
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
+
+    handleOnPressIn = () => {
+        console.log('pressed in')
+        startRecording();
+    }
+
+    handleOnPressOut = () => {
+        console.log('pressed out')
+        stopRecording();
+        console.log('stopped recording')
+        getTranscription();
+        console.log('finished getting transcription')
+    }
 
     async function submitHandler() {
         let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
@@ -68,12 +112,100 @@ export default function BusForm(props) {
             }
         });
         setMapDisplay(true);
+        console.log(busData);
     }
-    console.log(busData);
 
     function returnHome() {
         setMapDisplay(false);
     }
+
+    startRecording = async () => {
+        const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
+        if (status !== 'granted') return;
+
+        busState.isRecording = true;
+        console.log('isRecording (should now be true): ', busState.isRecording)
+        // some of these are not applicable, but are required
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+          playThroughEarpieceAndroid: true,
+
+        });
+        console.log('made it here i suspect')
+        // const recording = new Audio.Recording();
+        try {
+            await busState._recording.prepareToRecordAsync(recordingOptions);
+            await busState._recording.startAsync();
+            console.log('and here?')
+        } catch (error) {
+          console.log(error);
+          stopRecording();
+        }
+        // console.log('(from startRecording) the recording: ', recording)
+        // busState._recording = recording;
+        console.log('should be an object: ', busState._recording)
+    }
+
+    stopRecording = async () => {
+        busState.isRecording = false;
+        console.log('trying to stop recording')
+        await busState._recording.stopAndUnloadAsync();
+        console.log('audio?: ', busState._recording)
+        try {
+            // nothing
+            console.log('rabbits lair')
+        } catch (error) {
+            console.log('Dragons Lair $%55')
+            // Do nothing -- we are already unloaded.
+        }
+    }
+
+    getTranscription = async () => {
+        busState.isFetching = true;
+        try {
+          const info = await FileSystem.getInfoAsync(busState._recording.getURI());
+          console.log(`FILE INFO: ${JSON.stringify(info)}`);
+          const uri = info.uri;
+          const formData = new FormData();
+          formData.append('file', {
+            uri,
+            type: 'audio/x-wav',
+            // could be anything
+            name: 'speech2text'
+          });
+          const response = await fetch(config.CLOUD_FUNCTION_URL, {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          busState.query = data.transcript;
+        } catch(error) {
+          console.log('There was an error', error);
+          stopRecording();
+          resetRecording();
+        }
+        busState.isFetching = false;
+    }
+
+    deleteRecordingFile = async () => {
+        console.log("Deleting file");
+        try {
+            const info = await FileSystem.getInfoAsync(busState._recording.getURI());
+            await FileSystem.deleteAsync(info.uri)
+        } catch(error) {
+            console.log("There was an error deleting recording file", error);
+        }
+    }
+
+    resetRecording = () => {
+        deleteRecordingFile();
+        busState._recording = null;
+    }
+
 
     let homeButton;
     let button;
@@ -125,7 +257,9 @@ export default function BusForm(props) {
 
                 <TouchableOpacity
                     style={styles.submitButton}
-                    onPress={() => submitHandler()}
+                    // onPress={() => submitHandler()}
+                    onPressIn={() => handleOnPressIn()}
+                    onPressOut={() => handleOnPressOut()}
                 >
                     <Image
                         style={styles.submitButton}
