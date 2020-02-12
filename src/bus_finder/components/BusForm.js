@@ -8,70 +8,68 @@ import {
     View,
     TouchableOpacity,
     Image,
-    Dimensions
+    Dimensions,
+    Animated
 } from "react-native";
 import { render } from "react-dom";
-import BusMap from './BusMap.js'
-import Results from './Results.js'
+import BusMap from "./BusMap.js";
+import Results from "./Results.js";
+import TextCarousel from "react-native-text-carousel";
+
 const { width } = Dimensions.get("screen");
 
 export default function BusForm(props) {
     const busState = {
-        busNumber: "",
-
         closestData: {
-            closest_name: null,
-            closest_direction: null,
-            closest_minutes: null,
-            closest_lat: null,
-            closest_lon: null
+            closestName: null,
+            closestDirection: null,
+            closestMinutes: null,
+            closestLat: null,
+            closestLon: null
         },
         nextClosestData: {
-            next_closest_name: null,
-            next_closest_direction: null,
-            next_closest_minutes: null,
-            next_closest_lat: null,
-            next_closest_lon: null,
+            nextClosestName: null,
+            nextClosestDirection: null,
+            nextClosestMinutes: null,
+            nextClosestLat: null,
+            nextClosestLon: null,
         },
 
-        testData1: {
-            closest_name: 1,
-            closest_direction: "N",
-            closest_minutes: "12 minutes",
-            closest_lat: 1,
-            closest_lon: 1
-        },
+};
 
-        testData2: {
-            next_closest_name: 2,
-            next_closest_direction: "SE",
-            next_closest_minutes: "5 minutes",
-            next_closest_lat: 2,
-            next_closest_lon: 2
-        }
-
-
-
-    };
     const [mapDisplay, setMapDisplay] = React.useState(false);
+    const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
 
-    function submitHandler(event) {
-        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busData.busNumber}`;
+    async function submitHandler() {
+        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
         console.log(url);
-        // return fetch(url)
-        //     .then(response => {
-        //         console.log(response)
-        //         // do some logic to update state
 
-        //     })
-        //     .catch(error => {
-        //         console.error(error);
-        //     });
+        const response = await fetch(url);
+        const data = await response.json();
 
+        // updateBusRoute("")
+        updateBusData({
+            closestData: {
+                closestName: data.closest_stop.closest_name,
+                closestDirection: data.closest_stop.closest_direction,
+                closestMinutes: data.closest_stop.closest_minutes,
+                closestLat: data.closest_stop.closest_lat,
+                closestLon: data.closest_stop.closest_lon
+            },
+
+            nextClosestData: {
+                nextClosestName: data.next_closest_stop.next_closest_name,
+                nextClosestDirection:
+                    data.next_closest_stop.next_closest_direction,
+                nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
+                nextClosestLat: data.next_closest_stop.next_closest_lat,
+                nextClosestLon: data.next_closest_stop.next_closest_lon
+            }
+        });
         setMapDisplay(true);
-        updateBusData({busNumber: ""});
     }
+    console.log(busData);
 
     function returnHome() {
         setMapDisplay(false);
@@ -83,7 +81,13 @@ export default function BusForm(props) {
     let results;
 
     if (mapDisplay) {
-        results = <Results busNumber ={busData.busNumber} closest={busState.testData1} nextClosest={busState.testData2}/>
+        results = (
+            <Results
+                busNumber={busRoute}
+                closest={busData.closestData}
+                nextClosest={busData.nextClosestData}
+            />
+        );
         busmap = (
             <BusMap
                 lat={props.lat}
@@ -103,6 +107,22 @@ export default function BusForm(props) {
         button = (
             <View style={styles.container}>
                 <Text style={styles.header}>Where's My Bus?</Text>
+
+                <TextCarousel>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>Tap to speak</Text>
+                        </View>
+                    </TextCarousel.Item>
+                    <TextCarousel.Item>
+                        <View style={styles.carouselContainer}>
+                            <Text style={styles.opacityText}>
+                                When does "8" get here?
+                            </Text>
+                        </View>
+                    </TextCarousel.Item>
+                </TextCarousel>
+
                 <TouchableOpacity
                     style={styles.submitButton}
                     onPress={() => submitHandler()}
@@ -112,10 +132,14 @@ export default function BusForm(props) {
                         source={require("./button.png")}
                     />
                 </TouchableOpacity>
+                <Text style={styles.opacityText2}>
+                    Or type your bus number and tap
+                </Text>
+
                 <TextInput
                     style={styles.input}
-                    onChangeText={text => updateBusData({ busNumber: text })}
-                    value={busData.busNumber}
+                    onChangeText={text => updateBusRoute(text)}
+                    value={busRoute}
                 />
             </View>
         );
@@ -132,12 +156,38 @@ export default function BusForm(props) {
 }
 
 const styles = StyleSheet.create({
+    opacityText2: {
+        opacity: 0.2,
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 20,
+        margin: 50,
+        justifyContent: "center", //Centered vertically
+        alignItems: "center",
+        paddingBottom: 20
+    },
+    opacityText: {
+        opacity: 0.2,
+        color: "white",
+        fontWeight: "bold",
+        fontSize: 20
+    },
+
+    carouselContainer: {
+        margin: 0,
+        justifyContent: "center", //Centered vertically
+        alignItems: "center",
+        paddingBottom: 0
+    },
     header: {
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 20,
         color: "white",
         justifyContent: "center", //Centered vertically
         alignItems: "center", // Centered horizontally,
         fontWeight: "bold",
-        fontSize: 50,
+        fontSize: 47,
         paddingBottom: 70
     },
     container: {
@@ -149,9 +199,9 @@ const styles = StyleSheet.create({
     },
     input: {
         width: width / 2,
-        margin: 80,
+        margin: 0,
         height: 40,
-        borderColor: "#7A42F4",
+        borderColor: "#29c7ac",
         borderWidth: 1,
         textAlign: "center"
     },

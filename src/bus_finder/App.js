@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import BusForm from "./components/BusForm";
-import BusMap from './components/BusMap'
+import BusMap from "./components/BusMap";
 import {
     FormLabel,
     FormInput,
@@ -53,8 +53,11 @@ export default class App extends React.Component {
 
         return (
             <View style={styles.container}>
-                <BusForm lat={this.state.lat} long={this.state.long} busCoords={this.state.busCoords} />
-
+                <BusForm
+                    lat={this.state.lat}
+                    long={this.state.long}
+                    busCoords={this.state.busCoords}
+                />
             </View>
         );
     }
@@ -74,3 +77,5 @@ const styles = StyleSheet.create({
         textAlign: "center"
     }
 });
+
+console.disableYellowBox = true;
