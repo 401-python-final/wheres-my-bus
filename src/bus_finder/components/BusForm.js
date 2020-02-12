@@ -32,9 +32,11 @@ export default function BusForm(props) {
             nextClosestDirection: null,
             nextClosestMinutes: null,
             nextClosestLat: null,
-            nextClosestLon: null
-        }
-    };
+            nextClosestLon: null,
+        },
+
+};
+
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
