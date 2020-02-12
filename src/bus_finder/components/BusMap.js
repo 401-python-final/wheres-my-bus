@@ -1,7 +1,6 @@
 import React from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, TextInput } from 'react-native';
-import BusForm from './BusForm.js'
 
 
 export default function BusMap(props) {
@@ -18,22 +17,22 @@ export default function BusMap(props) {
                 }}
             >
 
-                {/* <Marker
+                <Marker
                     coordinate={{
-                        latitude: props.closest.closest_lat,
-                        longitude: props.closest.closest_lon
+                        latitude: props.closest.closestLat,
+                        longitude: props.closest.closestLon
                     }}
                     title={props.closest.closest_name}
                     description={"marker"}
                 />
                 <Marker
                     coordinate={{
-                        latitude: props.nextClosest.next_closest_lat,
-                        longitude: props.nextClosest.next_closest_lon
+                        latitude: props.nextClosest.nextClosestLat,
+                        longitude: props.nextClosest.nextClosestLon
                     }}
                     title={props.nextClosest.next_closest_name}
                     description={"marker"}
-                /> */}
+                />
             </MapView>
 
             {/* <Callout>

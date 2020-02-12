@@ -36,13 +36,11 @@ export default function BusForm(props) {
             nextClosestLon: null,
         },
 
+};
 
-
-    };
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("")
     const [busData, updateBusData] = React.useState(busState);
-
 
     async function submitHandler() {
         let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
