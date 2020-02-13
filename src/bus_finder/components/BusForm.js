@@ -18,49 +18,114 @@ import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 import Ripple from "react-native-material-ripple";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Voice from "react-native-voice";
 
 const { width } = Dimensions.get("screen");
 const { height } = Dimensions.get("screen");
 
-export default function BusForm(props) {
-    const busState = {
-        closestData: {
-            closestName: null,
-            closestDirection: null,
-            closestMinutes: null,
-            closestLat: null,
-            closestLon: null
-        },
-        nextClosestData: {
-            nextClosestName: null,
-            nextClosestDirection: null,
-            nextClosestMinutes: null,
-            nextClosestLat: null,
-            nextClosestLon: null
-        }
+const recordingOptions = {
+    // android not currently in use, but parameters are required
+    android: {
+        extension: '.m4a',
+        outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
+        audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
+        sampleRate: 44100,
+        numberOfChannels: 2,
+        bitRate: 128000,
+    },
+    ios: {
+        extension: '.wav',
+        audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
+        sampleRate: 44100,
+        numberOfChannels: 1,
+        bitRate: 128000,
+        linearPCMBitDepth: 16,
+        linearPCMIsBigEndian: false,
+        linearPCMIsFloat: false,
+    },
+};
+
+export default class BusForm extends React.Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            busRoute: '',
+            mapDisplay: false,
+            recognized: '',
+            started: '',
+            results: [],
+            closestData: {
+                closestName: null,
+                closestDirection: null,
+                closestMinutes: null,
+                closestLat: null,
+                closestLon: null
+            },
+            nextClosestData: {
+                nextClosestName: null,
+                nextClosestDirection: null,
+                nextClosestMinutes: null,
+                nextClosestLat: null,
+                nextClosestLon: null
+            }
+        };
+        this.submitHandler = this.submitHandler.bind(this)
+        this.componentDidMount = this.componentDidMount.bind(this)
+        this.returnHome = this.returnHome.bind(this)
+        this._startRecognition = this._startRecognition.bind(this)
+
+        Voice.onSpeechStart = this.onSpeechStart.bind(this)
+        Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
+        Voice.onSpeechResults = this.onSpeechResults.bind(this)
     };
 
-    const [mapDisplay, setMapDisplay] = React.useState(false);
-    const [busRoute, updateBusRoute] = React.useState("");
-    const [busData, updateBusData] = React.useState(busState);
+    componentWillUnmount() {
+        Voice.destroy().then(Voice.removeAllListeners);
+    }
+    onSpeechStart(e) {
+        this.setState({
+          started: '√',
+        });
+    }
+    onSpeechRecognized(e) {
+        this.setState({
+          recognized: '√',
+        });
+    }
+    onSpeechResults(e) {
+        this.setState({
+          results: e.value,
+        });
+    }
 
-    async function submitHandler() {
-        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
+    async _startRecognition(e) {
+        this.setState({
+          recognized: '',
+          started: '',
+          results: [],
+        });
+        try {
+          await Voice.start('en-US');
+        } catch (e) {
+          console.error(e);
+        }
+    }
+
+    async submitHandler() {
+        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${this.state.busRoute}`;
         console.log(url);
 
         const response = await fetch(url);
-        const data = await response.json();
+        const json = await response.json();
 
-        // updateBusRoute("")
-        updateBusData({
+        this.setState({
             closestData: {
-                closestName: data.closest_stop.closest_name,
-                closestDirection: data.closest_stop.closest_direction,
-                closestMinutes: data.closest_stop.closest_minutes,
-                closestLat: data.closest_stop.closest_lat,
-                closestLon: data.closest_stop.closest_lon
+                closestName: json.closest_stop.closest_name,
+                closestDirection: json.closest_stop.closest_direction,
+                closestMinutes: json.closest_stop.closest_minutes,
+                closestLat: json.closest_stop.closest_lat,
+                closestLon: json.closest_stop.closest_lon
             },
-
             nextClosestData: {
                 nextClosestName: data.next_closest_stop.next_closest_name,
                 nextClosestDirection:
@@ -68,177 +133,184 @@ export default function BusForm(props) {
                 nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
                 nextClosestLat: data.next_closest_stop.next_closest_lat,
                 nextClosestLon: data.next_closest_stop.next_closest_lon
-            }
+            },
+            mapDisplay: true
         });
-        setMapDisplay(true);
-    }
-    console.log(busData);
-
-    function returnHome() {
-        setMapDisplay(false);
+        console.log('closest data: ', this.state.closestData)
+        console.log('nextClosest data: ', this.state.nextClosestData)
     }
 
-    let homeButton;
-    let button;
-    let busmap;
-    let results;
+    returnHome() {
+        this.setState({
+            mapDisplay: false,
+        })
+    }
 
-    if (mapDisplay) {
-        results = (
-            <Results
-                busNumber={busRoute}
-                closest={busData.closestData}
-                nextClosest={busData.nextClosestData}
-            />
-        );
-        busmap = (
-            <BusMap
-                lat={props.lat}
-                long={props.long}
-                closest={busData.closestData}
-                nextClosest={busData.nextClosestData}
-            />
-        );
-        button = <></>;
-        homeButton = (
-            <Button title="Start Over" onPress={() => returnHome()}></Button>
-        );
-    } else {
-        busmap = <></>;
-        button = (
-            <Fragment>
-                <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
-                    <View style={styles.top}>
-                        <View>
-                            <Text style={styles.header}>Where's My Bus?</Text>
+    render(){
+        let homeButton;
+        let button;
+        let busmap;
+        let results;
+
+        if(this.state.mapDisplay){
+            results = (
+                <Results
+                    busNumber={this.state.busRoute}
+                    closest={this.state.closestData}
+                    nextClosest={this.state.nextClosestData}
+                />
+            );
+            busmap = (
+                <BusMap
+                    lat={props.lat}
+                    long={props.long}
+                    closest={this.state.closestData}
+                    nextClosest={this.state.nextClosestData}
+                />
+            );
+            button = <></>;
+            homeButton = (
+                <Button title="Start Over" onPress={() => returnHome()}></Button>
+            );
+        } else {
+            busmap = <></>;
+            button = (
+                <Fragment>
+                    <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
+                        <View style={styles.top}>
+                            <View>
+                                <Text style={styles.header}>Where's My Bus?</Text>
+                            </View>
                         </View>
-                    </View>
 
-                    <View style={styles.center}>
-                        <TextCarousel>
-                            <TextCarousel.Item>
-                                <View style={styles.carouselContainer}>
-                                    <Text style={styles.opacityText}>
-                                        Tap to speak
-                                    </Text>
-                                </View>
-                            </TextCarousel.Item>
-                            <TextCarousel.Item>
-                                <View style={styles.carouselContainer}>
-                                    <Text style={styles.opacityText}>
-                                        When does "8" get here?
-                                    </Text>
-                                </View>
-                            </TextCarousel.Item>
-                        </TextCarousel>
-                        <Ripple
-                            rippleColor="rgb(52, 61, 235)"
-                            rippleDuration="2400"
-                            // rippleContainerBorderRadius="100" //aj commented this out
-                            rippleCentered="true"
-                            style={styles.submitButton}
-                            onPress={() => submitHandler()}
-                        >
-                            <Image
+                        <View style={styles.center}>
+                            <TextCarousel>
+                                <TextCarousel.Item>
+                                    <View style={styles.carouselContainer}>
+                                        <Text style={styles.opacityText}>
+                                            Tap to speak
+                                        </Text>
+                                    </View>
+                                </TextCarousel.Item>
+                                <TextCarousel.Item>
+                                    <View style={styles.carouselContainer}>
+                                        <Text style={styles.opacityText}>
+                                            When does "8" get here?
+                                        </Text>
+                                    </View>
+                                </TextCarousel.Item>
+                            </TextCarousel>
+                            <Ripple
+                                rippleColor="rgb(52, 61, 235)"
+                                rippleDuration="2400"
+                                // rippleContainerBorderRadius="100" //aj commented this out
+                                rippleCentered="true"
                                 style={styles.submitButton}
-                                source={require("./button.png")}
+                                onPress={() => this._startRecognition()}
+                            >
+                                <Image
+                                    style={styles.submitButton}
+                                    source={require("./button.png")}
+                                />
+                            </Ripple>
+                        </View>
+                        <View style={styles.bottom}>
+                            <Text style={styles.opacityText2}>
+                                Or type your bus number and tap
+                            </Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={text => this.setState({busRoute: text})}
+                                value={this.state.busRoute}
                             />
-                        </Ripple>
-                    </View>
-                    <View style={styles.bottom}>
-                        <Text style={styles.opacityText2}>
-                            Or type your bus number and tap
-                        </Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={text => updateBusRoute(text)}
-                            value={busRoute}
-                        />
-                    </View>
-                </KeyboardAvoidingView>
-            </Fragment>
+                            <Button onPress={() => this.submitHandler()}
+                                    title="Search"></Button>
+                        </View>
+                    </KeyboardAvoidingView>
+                </Fragment>
+            );
+        }
+        return (
+            <View style={this.styles.container}>
+                {button}
+                {results}
+                {busmap}
+                {homeButton}
+            </View>
         );
     }
 
-    return (
-        <View style={styles.container}>
-            {button}
-            {results}
-            {busmap}
-            {homeButton}
-        </View>
-    );
+    styles = StyleSheet.create({
+        opacityText2: {
+            opacity: 0.2,
+            color: "white",
+            fontWeight: "bold",
+            fontSize: 20,
+            margin: 50,
+            marginBottom: 25,
+            justifyContent: "space-between", //Centered vertically
+            alignItems: "center"
+        },
+        opacityText: {
+            opacity: 0.2,
+            color: "white",
+            fontWeight: "bold",
+            fontSize: 20
+        },
+
+        carouselContainer: {
+            margin: 0,
+            justifyContent: "center", //Centered vertically
+            alignItems: "center",
+            paddingBottom: 0
+        },
+        top: {
+            height: "25%",
+            alignItems: "center",
+            justifyContent: "center"
+        },
+        header: {
+            color: "#f7f5f5",
+            fontWeight: "bold",
+            fontSize: 47
+        },
+
+        center: {
+            height: "35%",
+            alignItems: "center",
+            justifyContent: "center"
+        },
+
+        bottom: {
+            height: "35%", // aj changed this
+            alignItems: "center",
+            justifyContent: "center"
+        },
+
+        container: {
+            flex: 1,
+            backgroundColor: "#54123B",
+            ...StyleSheet.absoluteFillObject
+        },
+
+        input: {
+            width: width / 2,
+            height: 40,
+            borderColor: "#29c7ac",
+            borderWidth: 3,
+            backgroundColor: "#f7f5f5",
+            textAlign: 'center', //aj changed this
+
+        },
+        submitButton: {
+            alignItems: "center",
+            padding: 10,
+            width: width / 1.5,
+            height: width / 1.5
+        }
+    });
 }
 
-const styles = StyleSheet.create({
-    opacityText2: {
-        opacity: 0.2,
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 20,
-        margin: 50,
-        marginBottom: 25,
-        justifyContent: "space-between", //Centered vertically
-        alignItems: "center"
-    },
-    opacityText: {
-        opacity: 0.2,
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 20
-    },
-
-    carouselContainer: {
-        margin: 0,
-        justifyContent: "center", //Centered vertically
-        alignItems: "center",
-        paddingBottom: 0
-    },
-    top: {
-        height: "25%",
-        alignItems: "center",
-        justifyContent: "center"
-    },
-    header: {
-        color: "#f7f5f5",
-        fontWeight: "bold",
-        fontSize: 47
-    },
-
-    center: {
-        height: "35%",
-        alignItems: "center",
-        justifyContent: "center"
-    },
-
-    bottom: {
-        height: "35%", // aj changed this
-        alignItems: "center",
-        justifyContent: "center"
-    },
-
-    container: {
-        flex: 1,
-        backgroundColor: "#54123B",
-        ...StyleSheet.absoluteFillObject
-    },
-
-    input: {
-        width: width / 2,
-        height: 40,
-        borderColor: "#29c7ac",
-        borderWidth: 3,
-        backgroundColor: "#f7f5f5",
-        textAlign: 'center', //aj changed this
-
-    },
-    submitButton: {
-        alignItems: "center",
-        padding: 10,
-        width: width / 1.5,
-        height: width / 1.5
-    }
-});
 // when button Submit clicked > call event handler, that will make an API call to back end
 // if call was successsful render Details component
 // else render error message on the page
