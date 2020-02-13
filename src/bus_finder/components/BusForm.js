@@ -20,6 +20,8 @@ import Ripple from "react-native-material-ripple";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Audio } from 'expo-av';
 import * as Permissions from 'expo-permissions';
+
+import { Sound } from "expo-av/build/Audio";
 // import Voice from "react-native-voice";
 
 const { width } = Dimensions.get("screen");
@@ -222,14 +224,40 @@ export default class BusForm extends React.Component {
         try {
 
             const uri = this.state._recording.getURI();
-            // const slicedUri = uri.slice(7);
-            // console.log('slicedUri', slicedUri);
             console.log('here is the uri: ', uri);
 
-            fetch(uri).then((response) => {
-                console.log('response: ', response)
-                console.log('made it here???xxxx')
-            });
+            // const sound = new Sound(uri, Sound.MAIN_BUNDLE, (error) => {
+
+            //     // console.log('making a sound========')
+            //     if (error) {
+            //         // console.log('failed to make a sound======')
+            //         console.log('failed to load the sound', error);
+            //     } else {
+            //         // console.log('we made a new Sound!: =========')
+            //         // sound.play(); // have to put the call to play() in the onload callback
+            //     }
+            // });
+            // console.log('did we make a sound?:======', sound)
+            // const slicedUri = uri.slice(7);
+            // console.log('slicedUri', slicedUri);
+
+            // const response = await fetch(uri);
+            // console.log('response: ', JSON.stringify(response))
+            // theFile = JSON.stringify(response)
+
+            let wav = new FormData();
+            wav.append('file', { uri: uri });
+
+            const res = await fetch(`http://178.128.6.148:8000/api/v1/${this.props.lat}/${this.props.long}`, {
+                method: 'POST',
+                body: wav
+            })
+            console.log('response? ', res)
+            console.log('response? ', JSON.stringify(res))
+            // fetch(uri).then((response) => {
+            //     console.log('response: ', response.json())
+            //     console.log('made it here???xxxx')
+            // });
             console.log('made it here???')
             // const fetchdURI = await fetch(uri);
             // console.log('fetchdURI: ', fetchdURI);
@@ -271,9 +299,9 @@ export default class BusForm extends React.Component {
                 />
             );
             button = <></>;
-            homeButton = (
-                <Button title="Start Over" onPress={() => returnHome()}></Button>
-            );
+            // homeButton = (
+            //     <Button title="Start Over" onPress={this.setState({mapDisplay: false})}></Button>
+            // );
         } else {
             busmap = <></>;
             button = (
