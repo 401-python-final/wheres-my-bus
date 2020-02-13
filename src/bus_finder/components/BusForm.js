@@ -188,7 +188,7 @@ export default class BusForm extends React.Component {
     async submitHandler() {
         console.log('pressed form button')
 
-        let url = `http://178.128.6.148:8000/api/v1/${this.props.lat}/${this.props.long}/${this.state.busRoute}`;
+        const url = `http://178.128.6.148:8000/api/v1/${this.props.lat}/${this.props.long}/${this.state.busRoute}`;
         console.log(url);
 
         const response = await fetch(url);
@@ -203,12 +203,12 @@ export default class BusForm extends React.Component {
                 closestLon: json.closest_stop.closest_lon
             },
             nextClosestData: {
-                nextClosestName: data.next_closest_stop.next_closest_name,
+                nextClosestName: json.next_closest_stop.next_closest_name,
                 nextClosestDirection:
-                    data.next_closest_stop.next_closest_direction,
-                nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
-                nextClosestLat: data.next_closest_stop.next_closest_lat,
-                nextClosestLon: data.next_closest_stop.next_closest_lon
+                    json.next_closest_stop.next_closest_direction,
+                nextClosestMinutes: json.next_closest_stop.next_closest_minutes,
+                nextClosestLat: json.next_closest_stop.next_closest_lat,
+                nextClosestLon: json.next_closest_stop.next_closest_lon
             },
             mapDisplay: true
         });
