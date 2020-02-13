@@ -10,7 +10,8 @@ import {
     Image,
     Dimensions,
     Animated,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    TouchableHighlight
 } from "react-native";
 import { render } from "react-dom";
 import BusMap from "./BusMap.js";
@@ -23,7 +24,6 @@ const { width } = Dimensions.get("screen");
 const { height } = Dimensions.get("screen");
 
 export default function BusForm(props) {
-
     const busState = {
         closestData: {
             closestName: null,
@@ -40,7 +40,6 @@ export default function BusForm(props) {
             nextClosestLon: null
         }
     };
-    
 
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
@@ -94,16 +93,24 @@ export default function BusForm(props) {
             />
         );
         busmap = (
-            <BusMap
-                lat={props.lat}
-                long={props.long}
-                closest={busData.closestData}
-                nextClosest={busData.nextClosestData}
-            />
+            <View style={styles.center2}>
+                <BusMap
+                    lat={props.lat}
+                    long={props.long}
+                    closest={busData.closestData}
+                    nextClosest={busData.nextClosestData}
+                />
+            </View>
         );
+        {
+        }
         button = <></>;
         homeButton = (
-            <Button title="Find Another Bus" onPress={() => returnHome()}></Button>
+            <View style={styles.bottom2}>
+                <TouchableOpacity onPress={() => returnHome()}>
+                    <Image source={require("./button_another.png")} />
+                </TouchableOpacity>
+            </View>
         );
     } else {
         busmap = <></>;
@@ -156,6 +163,12 @@ export default function BusForm(props) {
                             onChangeText={text => updateBusRoute(text)}
                             value={busRoute}
                         />
+                        <TouchableHighlight onPress={() => submitHandler()}>
+                            <Image
+                                style={styles.submitButton2}
+                                source={require("./button_search.png")}
+                            />
+                        </TouchableHighlight>
                     </View>
                 </KeyboardAvoidingView>
             </Fragment>
@@ -212,13 +225,21 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center"
     },
-
+    center2: {
+        height: "50%",
+        alignItems: "center",
+        justifyContent: "center"
+    },
     bottom: {
         height: "35%", // aj changed this
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "center"
     },
-
+    bottom2: {
+        height: "25%", // aj changed this
+        alignItems: "center",
+        justifyContent: "center"
+    },
     container: {
         flex: 1,
         backgroundColor: "#54123B",
@@ -231,13 +252,25 @@ const styles = StyleSheet.create({
         borderColor: "#29c7ac",
         borderWidth: 3,
         backgroundColor: "#f7f5f5",
-        textAlign: 'center', //aj changed this
+        textAlign: "center" //aj changed this
     },
     submitButton: {
         alignItems: "center",
         padding: 10,
         width: width / 1.5,
         height: width / 1.5
+    },
+    submitButton2: {
+        alignItems: "center",
+        margin: 3,
+        width: width / 3,
+        height: width / 10
+    },
+    submitButton3: {
+        alignItems: "center",
+        margin: 10,
+        width: width / 3,
+        height: width / 10
     }
 });
 // when button Submit clicked > call event handler, that will make an API call to back end
