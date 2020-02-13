@@ -19,13 +19,10 @@ import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 import * as Permissions from 'expo-permissions';
 import * as FileSystem from 'expo-file-system';
-
 import Ripple from "react-native-material-ripple";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
 const { width } = Dimensions.get("screen");
 const { height } = Dimensions.get("screen");
-
 const recordingOptions = {
     // android not currently in use, but parameters are required
     android: {
@@ -47,8 +44,6 @@ const recordingOptions = {
         linearPCMIsFloat: false,
     },
 };
-
-
 export default function BusForm(props) {
     const busState = {
         isRecording: false,
@@ -70,16 +65,13 @@ export default function BusForm(props) {
             nextClosestLon: null
         }
     };
-
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
-
     handleOnPressIn = () => {
         console.log('pressed in')
         startRecording();
     }
-
     handleOnPressOut = () => {
         console.log('pressed out')
         stopRecording();
@@ -87,14 +79,11 @@ export default function BusForm(props) {
         getTranscription();
         console.log('finished getting transcription')
     }
-
     async function submitHandler() {
         let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
         console.log(url);
-
         const response = await fetch(url);
         const data = await response.json();
-
         // updateBusRoute("")
         updateBusData({
             closestData: {
@@ -104,7 +93,6 @@ export default function BusForm(props) {
                 closestLat: data.closest_stop.closest_lat,
                 closestLon: data.closest_stop.closest_lon
             },
-
             nextClosestData: {
                 nextClosestName: data.next_closest_stop.next_closest_name,
                 nextClosestDirection:
@@ -117,15 +105,12 @@ export default function BusForm(props) {
         setMapDisplay(true);
         console.log(busData);
     }
-
     function returnHome() {
         setMapDisplay(false);
     }
-
     startRecording = async () => {
         const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
         if (status !== 'granted') return;
-
         busState.isRecording = true;
         console.log('isRecording (should now be true): ', busState.isRecording)
         // some of these are not applicable, but are required
@@ -136,7 +121,6 @@ export default function BusForm(props) {
           shouldDuckAndroid: true,
           interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
           playThroughEarpieceAndroid: true,
-
         });
         console.log('made it here i suspect')
         // const recording = new Audio.Recording();
@@ -152,7 +136,6 @@ export default function BusForm(props) {
         // busState._recording = recording;
         console.log('should be an object: ', busState._recording)
     }
-
     stopRecording = async () => {
         busState.isRecording = false;
         console.log('trying to stop recording')
@@ -166,7 +149,6 @@ export default function BusForm(props) {
             // Do nothing -- we are already unloaded.
         }
     }
-
     getTranscription = async () => {
         busState.isFetching = true;
         try {
@@ -193,7 +175,6 @@ export default function BusForm(props) {
         }
         busState.isFetching = false;
     }
-
     deleteRecordingFile = async () => {
         console.log("Deleting file");
         try {
@@ -203,18 +184,14 @@ export default function BusForm(props) {
             console.log("There was an error deleting recording file", error);
         }
     }
-
     resetRecording = () => {
         deleteRecordingFile();
         busState._recording = null;
     }
-
-
     let homeButton;
     let button;
     let busmap;
     let results;
-
     if (mapDisplay) {
         results = (
             <Results
@@ -245,7 +222,6 @@ export default function BusForm(props) {
                             <Text style={styles.header}>Where's My Bus?</Text>
                         </View>
                     </View>
-
                     <View style={styles.center}>
                         <TextCarousel>
                             <TextCarousel.Item>
@@ -293,7 +269,6 @@ export default function BusForm(props) {
             </Fragment>
         );
     }
-
     return (
         <View style={styles.container}>
             {button}
@@ -303,7 +278,6 @@ export default function BusForm(props) {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     opacityText2: {
         opacity: 0.2,
@@ -321,7 +295,6 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 20
     },
-
     carouselContainer: {
         margin: 0,
         justifyContent: "center", //Centered vertically
@@ -338,25 +311,21 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 47
     },
-
     center: {
         height: "35%",
         alignItems: "center",
         justifyContent: "center"
     },
-
     bottom: {
         height: "35%", // aj changed this
         alignItems: "center",
         justifyContent: "center"
     },
-
     container: {
         flex: 1,
         backgroundColor: "#54123B",
         ...StyleSheet.absoluteFillObject
     },
-
     input: {
         width: width / 2,
         height: 40,
@@ -364,7 +333,6 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         backgroundColor: "#f7f5f5",
         textAlign: 'center', //aj changed this
-
     },
     submitButton: {
         alignItems: "center",
@@ -376,5 +344,4 @@ const styles = StyleSheet.create({
 // when button Submit clicked > call event handler, that will make an API call to back end
 // if call was successsful render Details component
 // else render error message on the page
-
 // export default BusForm;

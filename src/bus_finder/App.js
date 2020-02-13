@@ -10,12 +10,10 @@ import {
     FormInput,
     FormValidationMessage
 } from "react-native-elements";
-
 export default class App extends React.Component {
     constructor(props) {
         super(props);
     }
-
     state = {
         location: null,
         lat: 47.6062,
@@ -23,11 +21,9 @@ export default class App extends React.Component {
         errorMessage: null,
         busCoords: []
     };
-
     componentDidMount() {
         this._getLocationAsync();
     }
-
     _getLocationAsync = async () => {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== "granted") {
@@ -35,14 +31,11 @@ export default class App extends React.Component {
                 errorMessage: "Permission to access location was denied"
             });
         }
-
         let location = await Location.getCurrentPositionAsync({});
-
         this.setState({ location });
         this.setState({ lat: location.coords.latitude });
         this.setState({ long: location.coords.longitude });
     };
-
     render() {
         let location = "Waiting..";
         if (this.state.errorMessage) {
@@ -50,7 +43,6 @@ export default class App extends React.Component {
         } else if (this.state.location) {
             location = JSON.stringify(this.state.location);
         }
-
         return (
             <View style={styles.container}>
                 <BusForm
@@ -62,7 +54,6 @@ export default class App extends React.Component {
         );
     }
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -77,5 +68,4 @@ const styles = StyleSheet.create({
         textAlign: "center"
     }
 });
-
 console.disableYellowBox = true;
