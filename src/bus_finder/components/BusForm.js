@@ -18,7 +18,9 @@ import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 import Ripple from "react-native-material-ripple";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Voice from "react-native-voice";
+import { Audio } from 'expo-av';
+import * as Permissions from 'expo-permissions';
+// import Voice from "react-native-voice";
 
 const { width } = Dimensions.get("screen");
 const { height } = Dimensions.get("screen");
@@ -51,9 +53,10 @@ export default class BusForm extends React.Component {
         this.state = {
             busRoute: '',
             mapDisplay: false,
-            recognized: '',
-            started: '',
-            results: [],
+            isRecording: false,
+            isFetching: false,
+            _recording: null,
+            query: null,
             closestData: {
                 closestName: null,
                 closestDirection: null,
@@ -70,49 +73,122 @@ export default class BusForm extends React.Component {
             }
         };
         this.submitHandler = this.submitHandler.bind(this)
-        this.componentDidMount = this.componentDidMount.bind(this)
         this.returnHome = this.returnHome.bind(this)
-        this._startRecognition = this._startRecognition.bind(this)
+        this.handleOnPressIn = this.handleOnPressIn.bind(this)
+        this.handleOnPressOut = this.handleOnPressOut.bind(this)
+        this.startRecording = this.startRecording.bind(this)
+        this.stopRecording = this.stopRecording.bind(this)
+        this.resetRecording = this.resetRecording.bind(this)
+        this.deleteRecordingFile = this.deleteRecordingFile.bind(this)
+        this.getTranscription = this.getTranscription.bind(this)
 
-        Voice.onSpeechStart = this.onSpeechStart.bind(this)
-        Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
-        Voice.onSpeechResults = this.onSpeechResults.bind(this)
+        // this._startRecognition = this._startRecognition.bind(this)
+        // this.componentDidMount = this.componentDidMount.bind(this)
+        // Voice.onSpeechStart = this.onSpeechStart.bind(this)
+        // Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
+        // Voice.onSpeechResults = this.onSpeechResults.bind(this)
     };
 
-    componentWillUnmount() {
-        Voice.destroy().then(Voice.removeAllListeners);
-    }
-    onSpeechStart(e) {
-        this.setState({
-          started: '√',
-        });
-    }
-    onSpeechRecognized(e) {
-        this.setState({
-          recognized: '√',
-        });
-    }
-    onSpeechResults(e) {
-        this.setState({
-          results: e.value,
-        });
+    // componentWillUnmount() {
+    //     // Voice.destroy().then(Voice.removeAllListeners);
+    // }
+    // onSpeechStart(e) {
+    //     this.setState({
+    //       started: '√',
+    //     });
+    // }
+    // onSpeechRecognized(e) {
+    //     this.setState({
+    //       recognized: '√',
+    //     });
+    // }
+    // onSpeechResults(e) {
+    //     this.setState({
+    //       results: e.value,
+    //     });
+    // }
+    // async _startRecognition(e) {
+    //     console.log('pressed voice button')
+    //     this.setState({
+    //       recognized: '',
+    //       started: '',
+    //       results: [],
+    //     });
+    //     try {
+    //     //   await Voice.start('en-US');
+    //     } catch (e) {
+    //       console.error(e);
+    //     }
+    // }
+
+    async handleOnPressIn() {
+        console.log('pressed in')
+        await this.startRecording();
     }
 
-    async _startRecognition(e) {
-        this.setState({
-          recognized: '',
-          started: '',
-          results: [],
+    async handleOnPressOut() {
+        console.log('pressed out')
+        await this.stopRecording();
+        await this.getTranscription();
+    }
+
+    async startRecording() {
+        const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
+        if (status !== 'granted') return;
+        this.setState({isRecording:true, _recording: new Audio.Recording()})
+
+        // some of these are not applicable, but are required
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true,
+          interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+          playThroughEarpieceAndroid: true,
+
         });
+
         try {
-          await Voice.start('en-US');
-        } catch (e) {
-          console.error(e);
+            await this.state._recording.prepareToRecordAsync(recordingOptions);
+            await this.state._recording.startAsync();
+        } catch (error) {
+          console.log(error);
+          this.stopRecording();
+        }
+        console.log('should be an object: ', this.state._recording)
+    }
+
+    async stopRecording() {
+        this.setState({isRecording: false})
+        await this.state._recording.stopAndUnloadAsync();
+        // try {
+        //     // nothing
+        //     console.log('rabbits lair')
+        // } catch (error) {
+        //     console.log('Dragons Lair $%55')
+        //     // Do nothing -- we are already unloaded.
+        // }
+    }
+
+    async deleteRecordingFile() {
+        console.log("Deleting file");
+        try {
+            const info = await FileSystem.getInfoAsync(this.state._recording.getURI());
+            await FileSystem.deleteAsync(info.uri)
+        } catch(error) {
+            console.log("There was an error deleting recording file", error);
         }
     }
 
+    resetRecording() {
+        this.deleteRecordingFile();
+        this.state._recording = null;
+    }
+
     async submitHandler() {
-        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${this.state.busRoute}`;
+        console.log('pressed form button')
+
+        let url = `http://178.128.6.148:8000/api/v1/${this.props.lat}/${this.props.long}/${this.state.busRoute}`;
         console.log(url);
 
         const response = await fetch(url);
@@ -140,6 +216,32 @@ export default class BusForm extends React.Component {
         console.log('nextClosest data: ', this.state.nextClosestData)
     }
 
+    async getTranscription() {
+        this.setState({isFetching: true})
+
+        try {
+
+            const uri = this.state._recording.getURI();
+            // const slicedUri = uri.slice(7);
+            // console.log('slicedUri', slicedUri);
+            console.log('here is the uri: ', uri);
+
+            fetch(uri).then((response) => {
+                console.log('response: ', response)
+                console.log('made it here???xxxx')
+            });
+            console.log('made it here???')
+            // const fetchdURI = await fetch(uri);
+            // console.log('fetchdURI: ', fetchdURI);
+
+        } catch(error) {
+          console.log('There was an error', error);
+          this.stopRecording();
+          this.resetRecording();
+        }
+        this.setState({isFetching: false})
+    }
+
     returnHome() {
         this.setState({
             mapDisplay: false,
@@ -162,8 +264,8 @@ export default class BusForm extends React.Component {
             );
             busmap = (
                 <BusMap
-                    lat={props.lat}
-                    long={props.long}
+                    lat={this.props.lat}
+                    long={this.props.long}
                     closest={this.state.closestData}
                     nextClosest={this.state.nextClosestData}
                 />
@@ -177,24 +279,24 @@ export default class BusForm extends React.Component {
             button = (
                 <Fragment>
                     <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
-                        <View style={styles.top}>
+                        <View style={this.styles.top}>
                             <View>
-                                <Text style={styles.header}>Where's My Bus?</Text>
+                                <Text style={this.styles.header}>Where's My Bus?</Text>
                             </View>
                         </View>
 
-                        <View style={styles.center}>
+                        <View style={this.styles.center}>
                             <TextCarousel>
                                 <TextCarousel.Item>
-                                    <View style={styles.carouselContainer}>
-                                        <Text style={styles.opacityText}>
+                                    <View style={this.styles.carouselContainer}>
+                                        <Text style={this.styles.opacityText}>
                                             Tap to speak
                                         </Text>
                                     </View>
                                 </TextCarousel.Item>
                                 <TextCarousel.Item>
-                                    <View style={styles.carouselContainer}>
-                                        <Text style={styles.opacityText}>
+                                    <View style={this.styles.carouselContainer}>
+                                        <Text style={this.styles.opacityText}>
                                             When does "8" get here?
                                         </Text>
                                     </View>
@@ -205,26 +307,27 @@ export default class BusForm extends React.Component {
                                 rippleDuration="2400"
                                 // rippleContainerBorderRadius="100" //aj commented this out
                                 rippleCentered="true"
-                                style={styles.submitButton}
-                                onPress={() => this._startRecognition()}
+                                style={this.styles.submitButton}
+                                // onPress={() => this._startRecognition()}
+                                onPressIn={() => this.handleOnPressIn()}
+                                onPressOut={() => this.handleOnPressOut()}
                             >
                                 <Image
-                                    style={styles.submitButton}
+                                    style={this.styles.submitButton}
                                     source={require("./button.png")}
                                 />
                             </Ripple>
                         </View>
-                        <View style={styles.bottom}>
-                            <Text style={styles.opacityText2}>
+                        <View style={this.styles.bottom}>
+                            <Text style={this.styles.opacityText2}>
                                 Or type your bus number and tap
                             </Text>
                             <TextInput
-                                style={styles.input}
+                                style={this.styles.input}
                                 onChangeText={text => this.setState({busRoute: text})}
                                 value={this.state.busRoute}
                             />
-                            <Button onPress={() => this.submitHandler()}
-                                    title="Search"></Button>
+                            <Button onPress={() => this.submitHandler()} title="Search"></Button>
                         </View>
                     </KeyboardAvoidingView>
                 </Fragment>
