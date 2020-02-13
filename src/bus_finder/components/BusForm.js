@@ -10,7 +10,8 @@ import {
     Image,
     Dimensions,
     Animated,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    TouchableHighlight
 } from "react-native";
 import { render } from "react-dom";
 import BusMap from "./BusMap.js";
@@ -18,8 +19,8 @@ import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 import Ripple from "react-native-material-ripple";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Audio } from 'expo-av';
-import * as Permissions from 'expo-permissions';
+import { Audio } from "expo-av";
+import * as Permissions from "expo-permissions";
 // import Voice from "react-native-voice";
 
 const { width } = Dimensions.get("screen");
@@ -28,30 +29,30 @@ const { height } = Dimensions.get("screen");
 const recordingOptions = {
     // android not currently in use, but parameters are required
     android: {
-        extension: '.m4a',
+        extension: ".m4a",
         outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_MPEG_4,
         audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_AAC,
         sampleRate: 44100,
         numberOfChannels: 2,
-        bitRate: 128000,
+        bitRate: 128000
     },
     ios: {
-        extension: '.wav',
+        extension: ".wav",
         audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
         sampleRate: 44100,
         numberOfChannels: 1,
         bitRate: 128000,
         linearPCMBitDepth: 16,
         linearPCMIsBigEndian: false,
-        linearPCMIsFloat: false,
-    },
+        linearPCMIsFloat: false
+    }
 };
 
 export default class BusForm extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
-            busRoute: '',
+            busRoute: "",
             mapDisplay: false,
             isRecording: false,
             isFetching: false,
@@ -72,22 +73,22 @@ export default class BusForm extends React.Component {
                 nextClosestLon: null
             }
         };
-        this.submitHandler = this.submitHandler.bind(this)
-        this.returnHome = this.returnHome.bind(this)
-        this.handleOnPressIn = this.handleOnPressIn.bind(this)
-        this.handleOnPressOut = this.handleOnPressOut.bind(this)
-        this.startRecording = this.startRecording.bind(this)
-        this.stopRecording = this.stopRecording.bind(this)
-        this.resetRecording = this.resetRecording.bind(this)
-        this.deleteRecordingFile = this.deleteRecordingFile.bind(this)
-        this.getTranscription = this.getTranscription.bind(this)
+        this.submitHandler = this.submitHandler.bind(this);
+        this.returnHome = this.returnHome.bind(this);
+        this.handleOnPressIn = this.handleOnPressIn.bind(this);
+        this.handleOnPressOut = this.handleOnPressOut.bind(this);
+        this.startRecording = this.startRecording.bind(this);
+        this.stopRecording = this.stopRecording.bind(this);
+        this.resetRecording = this.resetRecording.bind(this);
+        this.deleteRecordingFile = this.deleteRecordingFile.bind(this);
+        this.getTranscription = this.getTranscription.bind(this);
 
         // this._startRecognition = this._startRecognition.bind(this)
         // this.componentDidMount = this.componentDidMount.bind(this)
         // Voice.onSpeechStart = this.onSpeechStart.bind(this)
         // Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
         // Voice.onSpeechResults = this.onSpeechResults.bind(this)
-    };
+    }
 
     // componentWillUnmount() {
     //     // Voice.destroy().then(Voice.removeAllListeners);
@@ -122,44 +123,45 @@ export default class BusForm extends React.Component {
     // }
 
     async handleOnPressIn() {
-        console.log('pressed in')
+        console.log("pressed in");
         await this.startRecording();
     }
 
     async handleOnPressOut() {
-        console.log('pressed out')
+        console.log("pressed out");
         await this.stopRecording();
         await this.getTranscription();
     }
 
     async startRecording() {
-        const { status } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
-        if (status !== 'granted') return;
-        this.setState({isRecording:true, _recording: new Audio.Recording()})
+        const { status } = await Permissions.askAsync(
+            Permissions.AUDIO_RECORDING
+        );
+        if (status !== "granted") return;
+        this.setState({ isRecording: true, _recording: new Audio.Recording() });
 
         // some of these are not applicable, but are required
         await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-          playsInSilentModeIOS: true,
-          shouldDuckAndroid: true,
-          interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-          playThroughEarpieceAndroid: true,
-
+            allowsRecordingIOS: true,
+            interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+            playsInSilentModeIOS: true,
+            shouldDuckAndroid: true,
+            interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+            playThroughEarpieceAndroid: true
         });
 
         try {
             await this.state._recording.prepareToRecordAsync(recordingOptions);
             await this.state._recording.startAsync();
         } catch (error) {
-          console.log(error);
-          this.stopRecording();
+            console.log(error);
+            this.stopRecording();
         }
-        console.log('should be an object: ', this.state._recording)
+        console.log("should be an object: ", this.state._recording);
     }
 
     async stopRecording() {
-        this.setState({isRecording: false})
+        this.setState({ isRecording: false });
         await this.state._recording.stopAndUnloadAsync();
         // try {
         //     // nothing
@@ -173,9 +175,11 @@ export default class BusForm extends React.Component {
     async deleteRecordingFile() {
         console.log("Deleting file");
         try {
-            const info = await FileSystem.getInfoAsync(this.state._recording.getURI());
-            await FileSystem.deleteAsync(info.uri)
-        } catch(error) {
+            const info = await FileSystem.getInfoAsync(
+                this.state._recording.getURI()
+            );
+            await FileSystem.deleteAsync(info.uri);
+        } catch (error) {
             console.log("There was an error deleting recording file", error);
         }
     }
@@ -186,7 +190,7 @@ export default class BusForm extends React.Component {
     }
 
     async submitHandler() {
-        console.log('pressed form button')
+        console.log("pressed form button");
 
         const url = `http://178.128.6.148:8000/api/v1/${this.props.lat}/${this.props.long}/${this.state.busRoute}`;
         console.log(url);
@@ -212,49 +216,47 @@ export default class BusForm extends React.Component {
             },
             mapDisplay: true
         });
-        console.log('closest data: ', this.state.closestData)
-        console.log('nextClosest data: ', this.state.nextClosestData)
+        console.log("closest data: ", this.state.closestData);
+        console.log("nextClosest data: ", this.state.nextClosestData);
     }
 
     async getTranscription() {
-        this.setState({isFetching: true})
+        this.setState({ isFetching: true });
 
         try {
-
             const uri = this.state._recording.getURI();
             // const slicedUri = uri.slice(7);
             // console.log('slicedUri', slicedUri);
-            console.log('here is the uri: ', uri);
+            console.log("here is the uri: ", uri);
 
-            fetch(uri).then((response) => {
-                console.log('response: ', response)
-                console.log('made it here???xxxx')
+            fetch(uri).then(response => {
+                console.log("response: ", response);
+                console.log("made it here???xxxx");
             });
-            console.log('made it here???')
+            console.log("made it here???");
             // const fetchdURI = await fetch(uri);
             // console.log('fetchdURI: ', fetchdURI);
-
-        } catch(error) {
-          console.log('There was an error', error);
-          this.stopRecording();
-          this.resetRecording();
+        } catch (error) {
+            console.log("There was an error", error);
+            this.stopRecording();
+            this.resetRecording();
         }
-        this.setState({isFetching: false})
+        this.setState({ isFetching: false });
     }
 
     returnHome() {
         this.setState({
-            mapDisplay: false,
-        })
+            mapDisplay: false
+        });
     }
 
-    render(){
+    render() {
         let homeButton;
         let button;
         let busmap;
         let results;
 
-        if(this.state.mapDisplay){
+        if (this.state.mapDisplay) {
             results = (
                 <Results
                     busNumber={this.state.busRoute}
@@ -272,16 +274,29 @@ export default class BusForm extends React.Component {
             );
             button = <></>;
             homeButton = (
-                <Button title="Start Over" onPress={() => returnHome()}></Button>
+                <TouchableOpacity
+                    onPress={this.returnHome}
+                    style={this.styles.submitButton3}
+                >
+                    <Image
+                        style={this.styles.submitButton3}
+                        source={require("./button_start-over.png")}
+                    />
+                </TouchableOpacity>
             );
         } else {
             busmap = <></>;
             button = (
                 <Fragment>
-                    <KeyboardAvoidingView style={{ flex: 1 }} behavior="position">
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior="position"
+                    >
                         <View style={this.styles.top}>
                             <View>
-                                <Text style={this.styles.header}>Where's My Bus?</Text>
+                                <Text style={this.styles.header}>
+                                    Where's My Bus?
+                                </Text>
                             </View>
                         </View>
 
@@ -324,10 +339,19 @@ export default class BusForm extends React.Component {
                             </Text>
                             <TextInput
                                 style={this.styles.input}
-                                onChangeText={text => this.setState({busRoute: text})}
+                                onChangeText={text =>
+                                    this.setState({ busRoute: text })
+                                }
                                 value={this.state.busRoute}
                             />
-                            <Button onPress={() => this.submitHandler()} title="Search"></Button>
+                            <TouchableOpacity
+                                onPress={() => this.submitHandler()}
+                            >
+                                <Image
+                                    style={this.styles.submitButton2}
+                                    source={require("./button_search.png")}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </KeyboardAvoidingView>
                 </Fragment>
@@ -402,14 +426,26 @@ export default class BusForm extends React.Component {
             borderColor: "#29c7ac",
             borderWidth: 3,
             backgroundColor: "#f7f5f5",
-            textAlign: 'center', //aj changed this
-
+            textAlign: "center" //aj changed this
         },
         submitButton: {
             alignItems: "center",
             padding: 10,
             width: width / 1.5,
             height: width / 1.5
+        },
+        submitButton2: {
+            alignItems: "center",
+            margin: 5,
+            width: width / 4,
+            height: width / 10
+        },
+        submitButton3: {
+            alignItems: "center",
+            margin: 5,
+            width: width / 4,
+            height: width / 10,
+            justifyContent: "center"
         }
     });
 }
