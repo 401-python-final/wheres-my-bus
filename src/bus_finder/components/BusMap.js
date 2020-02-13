@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     mapStyle: {
-        width: Dimensions.get("window").width * 0.85,
+        width: Dimensions.get("window").width * 0.9,
         height: Dimensions.get("window").height * 0.6,
         borderRadius: 90
     },
