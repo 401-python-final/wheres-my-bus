@@ -39,7 +39,8 @@ export default function BusForm(props) {
             nextClosestMinutes: null,
             nextClosestLat: null,
             nextClosestLon: null
-        }
+        },
+        serverBusRoute: ""
     };
 
     const [mapDisplay, setMapDisplay] = React.useState(false);
@@ -53,6 +54,10 @@ export default function BusForm(props) {
 
         const response = await fetch(url);
         const data = await response.json();
+
+
+
+        console.log(data)
 
         // updateBusRoute("")
         updateBusData({
@@ -71,7 +76,9 @@ export default function BusForm(props) {
                 nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
                 nextClosestLat: data.next_closest_stop.next_closest_lat,
                 nextClosestLon: data.next_closest_stop.next_closest_lon
-            }
+            },
+            serverBusRoute: data.route
+
         });
         setMapDisplay(true);
     }
@@ -82,7 +89,7 @@ export default function BusForm(props) {
     }
 
     function speak(minutes) {
-        var thingToSay = `Bus 8 will be here in 4 minutes.`;
+        var thingToSay = `Bus 8 will be here in ${minutes} minutes.`;
         Speech.speak(thingToSay);
         console.log('speaking...=========')
     }
@@ -114,13 +121,16 @@ export default function BusForm(props) {
                     nextClosestMinutes: json.next_closest_stop.next_closest_minutes,
                     nextClosestLat: json.next_closest_stop.next_closest_lat,
                     nextClosestLon: json.next_closest_stop.next_closest_lon
-                }
+                },
+                serverBusRoute: json.route
+
             });
-            
+
             setMapDisplay(true);
             console.log('closest data: ', busData.closestData)
             console.log('nextClosest data: ', busData.nextClosestData)
-            speak(busData.closestMinutes)
+            console.log('bus data number', busData.closestData.closestMinutes)
+            speak(busData.closestData.closestMinutes)
         } catch (error) {
             console.log('There was an error', error);
             props.stopRecording();
@@ -146,7 +156,7 @@ export default function BusForm(props) {
     if (mapDisplay) {
         results = (
             <Results
-                busNumber={busRoute}
+                busNumber={busData.serverBusRoute}
                 closest={busData.closestData}
                 nextClosest={busData.nextClosestData}
             />
