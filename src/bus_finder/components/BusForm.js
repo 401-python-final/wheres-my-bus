@@ -39,7 +39,8 @@ export default function BusForm(props) {
             nextClosestMinutes: null,
             nextClosestLat: null,
             nextClosestLon: null
-        }
+        },
+        serverBusRoute: ""
     };
 
     const [mapDisplay, setMapDisplay] = React.useState(false);
@@ -53,6 +54,10 @@ export default function BusForm(props) {
 
         const response = await fetch(url);
         const data = await response.json();
+
+
+
+        console.log(data)
 
         // updateBusRoute("")
         updateBusData({
@@ -71,7 +76,9 @@ export default function BusForm(props) {
                 nextClosestMinutes: data.next_closest_stop.next_closest_minutes,
                 nextClosestLat: data.next_closest_stop.next_closest_lat,
                 nextClosestLon: data.next_closest_stop.next_closest_lon
-            }
+            },
+            serverBusRoute: data.route
+
         });
         setMapDisplay(true);
     }
@@ -116,7 +123,7 @@ export default function BusForm(props) {
                     nextClosestLon: json.next_closest_stop.next_closest_lon
                 }
             });
-            
+
             setMapDisplay(true);
             console.log('closest data: ', busData.closestData)
             console.log('nextClosest data: ', busData.nextClosestData)
@@ -146,7 +153,7 @@ export default function BusForm(props) {
     if (mapDisplay) {
         results = (
             <Results
-                busNumber={busRoute}
+                busNumber={busData.serverBusRoute}
                 closest={busData.closestData}
                 nextClosest={busData.nextClosestData}
             />
