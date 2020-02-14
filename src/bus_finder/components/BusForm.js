@@ -13,17 +13,18 @@ import {
     KeyboardAvoidingView,
     TouchableHighlight
 } from "react-native";
-import { render } from "react-dom";
 import BusMap from "./BusMap.js";
 import Results from "./Results.js";
 import TextCarousel from "react-native-text-carousel";
 import Ripple from "react-native-material-ripple";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as Speech from 'expo-speech';
+
+
 
 const { width } = Dimensions.get("screen");
-const { height } = Dimensions.get("screen");
 
 export default function BusForm(props) {
+
     const busState = {
         closestData: {
             closestName: null,
@@ -44,9 +45,10 @@ export default function BusForm(props) {
     const [mapDisplay, setMapDisplay] = React.useState(false);
     const [busRoute, updateBusRoute] = React.useState("");
     const [busData, updateBusData] = React.useState(busState);
+    const [isFetching, toggleIsFetching] = React.useState(false)
 
     async function submitHandler() {
-        let url = `http://178.128.6.148:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
+        let url = `http://167.172.226.189:8000/api/v1/${props.lat}/${props.long}/${busRoute}`;
         console.log(url);
 
         const response = await fetch(url);
@@ -78,6 +80,63 @@ export default function BusForm(props) {
     function returnHome() {
         setMapDisplay(false);
     }
+
+    function speak(minutes) {
+        var thingToSay = `Bus 8 will be here in 4 minutes.`;
+        Speech.speak(thingToSay);
+        console.log('speaking...=========')
+    }
+
+    async function getTranscription() {
+        // this.setState({ isFetching: true })
+        toggleIsFetching(true)
+        try {
+            const uri = props.recording.getURI();
+            console.log('here is the uri: ', uri);
+            let wav = new FormData();
+            wav.append('file', { uri: uri });
+            const response = await fetch(`http://167.172.226.189:8000/api/v1/${props.lat}/${props.long}`, {
+                method: 'POST',
+                body: wav
+            })
+            const json = await response.json();
+            updateBusData({
+                closestData: {
+                    closestName: json.closest_stop.closest_name,
+                    closestDirection: json.closest_stop.closest_direction,
+                    closestMinutes: json.closest_stop.closest_minutes,
+                    closestLat: json.closest_stop.closest_lat,
+                    closestLon: json.closest_stop.closest_lon
+                },
+                nextClosestData: {
+                    nextClosestName: json.next_closest_stop.next_closest_name,
+                    nextClosestDirection:json.next_closest_stop.next_closest_direction,
+                    nextClosestMinutes: json.next_closest_stop.next_closest_minutes,
+                    nextClosestLat: json.next_closest_stop.next_closest_lat,
+                    nextClosestLon: json.next_closest_stop.next_closest_lon
+                }
+            });
+            
+            setMapDisplay(true);
+            console.log('closest data: ', busData.closestData)
+            console.log('nextClosest data: ', busData.nextClosestData)
+            speak(busData.closestMinutes)
+        } catch (error) {
+            console.log('There was an error', error);
+            props.stopRecording();
+            props.resetRecording();
+        }
+        toggleIsFetching(false)
+        // this.setState({ isFetching: false })
+    }
+
+    async function newHandlePressOut() {
+        console.log('pressed out')
+        await props.stopRecording()
+        await getTranscription()
+    }
+
+
 
     let homeButton;
     let button;
@@ -146,7 +205,9 @@ export default function BusForm(props) {
                             // rippleContainerBorderRadius="100" //aj commented this out
                             rippleCentered="true"
                             style={styles.submitButton}
-                            onPress={() => submitHandler()}
+                            // onPress={() => submitHandler()}
+                            onPressIn={() => props.handleOnPressIn()}
+                            onPressOut={() => newHandlePressOut()}
                         >
                             <Image
                                 style={styles.submitButton}
@@ -184,7 +245,6 @@ export default function BusForm(props) {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     opacityText2: {
         opacity: 0.2,
