@@ -89,7 +89,7 @@ export default function BusForm(props) {
     }
 
     function speak(minutes) {
-        var thingToSay = `Bus 8 will be here in 4 minutes.`;
+        var thingToSay = `Bus 8 will be here in ${minutes} minutes.`;
         Speech.speak(thingToSay);
         console.log('speaking...=========')
     }
@@ -121,13 +121,16 @@ export default function BusForm(props) {
                     nextClosestMinutes: json.next_closest_stop.next_closest_minutes,
                     nextClosestLat: json.next_closest_stop.next_closest_lat,
                     nextClosestLon: json.next_closest_stop.next_closest_lon
-                }
+                },
+                serverBusRoute: json.route
+
             });
 
             setMapDisplay(true);
             console.log('closest data: ', busData.closestData)
             console.log('nextClosest data: ', busData.nextClosestData)
-            speak(busData.closestMinutes)
+            console.log('bus data number', busData.closestData.closestMinutes)
+            speak(busData.closestData.closestMinutes)
         } catch (error) {
             console.log('There was an error', error);
             props.stopRecording();
