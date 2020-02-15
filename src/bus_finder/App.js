@@ -6,7 +6,8 @@ import * as Permissions from "expo-permissions";
 import BusForm from "./components/BusForm";
 import { Audio } from 'expo-av';
 
-
+// https://fostermade.co/blog/making-speech-to-text-work-with-react-native-and-expo
+// Guide used to help with recording
 
 const recordingOptions = {
     // android not currently in use, but parameters are required
